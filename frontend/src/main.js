@@ -1,49 +1,27 @@
-import Home from "./pages/home.js";
 
-import SocketManager from './middleware/sockets.js';
+import Home from './pages/Home.js';
 
-const app = document.getElementById('main');
+const main = document.getElementById('main');
 
-const manager = new SocketManager('http://localhost:3000');
-
-manager.connect();
-
-// router for SPA
-
-let location = getLocation();
-
-function getLocation() {
-    return window.location.pathname;
-}
-
-function setLocation() {
-    location = getLocation();
-}
-
-function Link(to) {
-    window.location = to;
-    Main();
-}
-
-function Main() {
-
-    switch (location) {
-        case '/':
-            app.innerHTML = Home();
-            break;
-        case '/chat':
-            app.innerHTML = Chat();
-            break;
+const routes = {
+    '/': () => Home(),
+  };
+  
+  function render(path) {
+    const view = routes[path] || (() => '<h1>404 Not Found</h1>');
+    main.appendChild(view());
+  }
+  
+  document.body.addEventListener('click', (e) => {
+    if (e.target.matches('a[data-link]')) {
+      e.preventDefault();
+      const path = e.target.getAttribute('href');
+      history.pushState(null, '', path);
+      render(path);
     }
-
-}
-
-function Chat() {
-    return `
-        <section>
-            
-        </section>
-    `;
-}
-
-Main();
+  });
+  
+  window.addEventListener('popstate', () => render(window.location.pathname));
+  
+  render(window.location.pathname);
+  
