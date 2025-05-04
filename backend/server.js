@@ -4,46 +4,98 @@ const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const mysql2 = require('mysql2');
 const cors = require('cors');
+const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
+
+const winston = require('winston');
+const nodemailer = require('nodemailer');
+
+const app = express();
 
 const corsOptions = {
   origin: 'http://localhost:5173',
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'], 
+  credentials: true
 };
-
-const helmet = require('helmet');
-const winston = require('winston');
-
-const nodemailer = require('nodemailer');
-
-const app = express();
-
 app.use(cors(corsOptions));
 
 app.use(helmet());
 
+app.use((req, res, next) => {
+  res.setHeader("Content-Security-Policy", 
+    "default-src 'self'; " +
+    "script-src 'self'; " +
+    "style-src 'self' 'unsafe-inline'; " +
+    "object-src 'none'; " +
+    "connect-src 'self'; " +
+    "img-src 'self' data:;"
+  );
+  next();
+})
+
 const server = http.createServer(app);
 
-// Admin variable for storing if admin is online for support?
-
-// If they are not online all received messages are uploaded to db for later reading
-
-// Those users sessions will not be stored
-
-// PLAN:
-// Manages connected users allowing for admin view and responding
-// Will also allow for live user view 
 const UsersInterface = require('./interface/UsersInterface.js');
 const UserDirector = new UsersInterface();
 
-// PLAN:
-// Manages sockets
 const SocketInterface = require('./interface/SocketInterface.js');
 const SocketDirector = new SocketInterface(server, UserDirector);
 
 app.use(express.json());
+app.use(cookieParser());
 
-const adminSecret = 'admin-secret-key';
+
+function checkAdminToken(req, res, next) {
+  const token = req.cookies.token;
+
+  if (!token) return next();
+
+  try {
+    const decoded = jwt.decode(token);
+    if (decoded?.role === 'admin') {
+      return res.json({ message: 'is-admin' });
+    }
+  } catch (err) {
+    // Fall through
+  }
+
+  next();
+}
+
+
+function checkValidGuestToken(req, res, next) {
+  const token = req.cookies.token;
+
+  if (!token) return next();
+
+  jwt.verify(token, 'user-secret-token', (err) => {
+    if (!err) {
+      return res.json({ message: 'valid guest' });
+    }
+    next();
+  });
+}
+
+function issueGuestToken(req, res) {
+  const newToken = jwt.sign(
+    { room: `${Date.now()}_guest`, role: 'guest' },
+    'user-secret-token',
+    { expiresIn: '1h' }
+  );
+
+  res.cookie('token', newToken, {
+    httpOnly: true,
+    secure: false,
+    maxAge: 60 * 60 * 1000,
+    sameSite: 'strict',
+  });
+
+  return res.json({ message: 'new guest issued' });
+}
+
+app.get('/user-login', checkAdminToken, checkValidGuestToken, issueGuestToken);
+
 const adminCredentials = {
   username: 'root',
   password: 'root'
@@ -53,42 +105,78 @@ app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
   if (username === adminCredentials.username && password === adminCredentials.password) {
-    const token = jwt.sign({ role: 'admin' }, adminSecret, { expiresIn: '1h' });
-    return res.json({ token });
+
+    const token = jwt.sign({ room: 'admin', role: 'admin' }, 'admin-secret-token', { expiresIn: '1h' });
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false,
+      maxAge: 60 * 60 * 1000,
+      sameSite: 'strict',
+    });
+    // secure: process.env.NODE_ENV === 'production',
+
+    return res.json({ message: 'admin auth' });
   } else {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 });
 
 const verifyJWT = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1];
+
+  let token = req.cookies.token;
 
   if (!token) {
       return res.status(403).json({ message: 'Token required' });
   }
 
-  jwt.verify(token, adminSecret, (err, decoded) => {
+  jwt.verify(token, 'admin-secret-token', (err, decoded) => {
       if (err) {
-          console.log('JWT verification failed:', err);
-          return res.status(401).json({ message: 'Unauthorized - Invalid or expired token' });
+          return res.status(401).json({ message: err.message });
       }
 
-      req.user = decoded;
       next();
   });
 };
 
+/* ADMIN PROTECTED */
+
 app.get('/getUsers', verifyJWT, (req, res) => {
-  if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Forbidden - Admins only' });
-  }
-
-  let usersWithRooms = UserDirector.getAllUsers().filter(([socketId, user]) => user.room);
-
+  let usersWithRooms = UserDirector.getAllUsers();
   res.json(usersWithRooms); 
 });
 
-// Start server
+/* OPEN (rate limiting required) */
+
+app.get('/getUsersCount', (req, res) => {
+  let usersWithRooms = UserDirector.getAllUsers().length || 1;
+  res.json({ count: usersWithRooms }); 
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const PORT = 3000;
 server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

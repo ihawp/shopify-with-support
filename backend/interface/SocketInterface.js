@@ -1,6 +1,6 @@
-// SocketInterface.js
 const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
+const cookie = require('cookie');
 
 class SocketInterface {
     constructor(httpServer, UserDirector) {
@@ -8,77 +8,70 @@ class SocketInterface {
             cors: {
                 origin: "http://localhost:5173",
                 methods: ["GET", "POST"],
+                credentials: true,  // Allow cookies to be sent with WebSocket requests
             },
         });
 
         this.io.on('connection', (socket) => {
-
-            let verifier = 'user-secret-key';
+            let verifier = 'user-secret-token';
             let room = `${Date.now()}_guest`;
             let role = 'guest';
 
-            let handshake = socket.handshake.query.jwt;
+            const cookies = cookie.parse(socket.request.headers.cookie || '');
+            const token = cookies.token;
 
-            const createHandshake = () => {
-                return jwt.sign(
-                    { role: role },
-                    verifier,
-                    { expiresIn: '1h' }
-                );
+            if (!token) {
+                socket.emit('auth-error', 'disconnecting because no auth');
+                socket.disconnect();
             }
 
-            if (handshake === 'null') {
-                handshake = createHandshake();
-                this.emitToRoom(room, 'receive-jwt', { jwt: handshake });
-            } else {
-                const decoded = jwt.decode(handshake);
-                
-                if (decoded && decoded.role === 'admin') {
-                    verifier = 'admin-secret-key';
-                    room = 'admin';
+            let decoded = jwt.decode(token);
+
+            if (decoded && decoded.role === 'admin') {
+                verifier = 'admin-secret-token';
+            }
+
+            jwt.verify(token, verifier, (err, decoded) => {
+                if (err) {
+                    socket.emit('auth-error', 'Invalid or expired token.');
+                    socket.disconnect();
+                    return;
                 }
-    
-                jwt.verify(handshake, verifier, (err, decoded) => {
-                    if (err) {
-                        if (err.name === 'TokenExpiredError') {
-                            UserDirector.removeUserBySocketId(socket.id);
-                            socket.emit('auth-error', 'Your session has expired. Please log in again.');
-                        }
-                        socket.disconnect();
-                        return;
-                    }
-    
-                    role = decoded.role || 'guest';
-                    room = decoded.room || room;
-    
+
+                role = decoded.role || 'guest';
+                room = role === 'admin' ? 'admin' : room;
+
+                console.log(role);
+
+                socket.join(room);
+
+                // Dont update
+                // Or do, but don't change rooms or anything like that (it is important that each user can retain their session as long as their cookie lasts.)
+
+                UserDirector.addUser(socket.id, { socket: socket.id, room: room, role: role });
+
+                this.io.emit('user-join', UserDirector.getAllUsers().length);
+
+                socket.on('message', (data) => {
+                    this.emitToRoom(room, 'message', { user: socket.id, message: data });
                 });
-            }
 
-            const join = (newRoom) => {
-                socket.leave(room);
-                UserDirector.updateUser(socket.id, { socket: socket.id, room: newRoom, role: role });
-                socket.join(newRoom);
-            }
+                socket.on('change-room', (newRoom) => {
+                    if (role === 'admin') {
+                        socket.leave(room);
+                        room = newRoom;
+                        socket.join(newRoom);
+                    } else {
+                        socket.disconnect();
+                    }
+                });
 
-            join(room);
-
-            UserDirector.addUser(socket.id, { socket: socket.id, room: room, role: role });
-
-            socket.on('message', (data) => {
-                room = UserDirector.getUserData(socket.id).room;
-                this.emitToRoom(room, 'message', { user: socket.id, message: data });
-            });
-
-            socket.on('change-room', (room) => {
-                if (role === 'admin') {
-                    join(room);
-                };
-            })
-
-            socket.on('disconnect', () => {
-                if (UserDirector.userExists(socket.id)) {
-                    UserDirector.removeUserBySocketId(socket.id);
-                }
+                socket.on('disconnect', () => {
+                    if (UserDirector.userExists(socket.id)) {
+                        UserDirector.removeUserBySocketId(socket.id);
+                        this.io.emit('user-leave', UserDirector.getAllUsers().length);
+                    }
+                });
             });
         });
     }
