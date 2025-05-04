@@ -1,0 +1,156 @@
+/* MOBILE FIRST CSS - IHAWP.COM */
+
+html { scroll-behaviour: smooth; box-sizing: border-box; }
+*, *:before, *:after { box-sizing: inherit; margin: 0; padding: 0; }
+
+body {
+
+}
+
+:root {
+
+}
+
+/* ----------------------------------------------------------- */
+/* HEADERS */
+
+h1 {}
+
+h2 {}
+
+h3 {}
+
+h4 {}
+
+h5 {}
+
+h6 {}
+
+/* ----------------------------------------------------------- */
+/* PARAGRAPH */
+
+p {}
+
+/* ----------------------------------------------------------- */
+/* ANCHOR */
+
+a {}
+
+/* ----------------------------------------------------------- */
+/* HEADER */
+
+body > header {
+
+}
+
+main > header {
+
+}
+
+/* ----------------------------------------------------------- */
+/* MAIN */
+
+main {
+
+}
+
+section {
+
+}
+
+/* ----------------------------------------------------------- */
+/* FOOTER */
+
+footer {
+
+}
+
+/* ----------------------------------------------------------- */
+/* MEDIA */
+
+@media (min-width: 50em) {
+  
+}
+
+@media (min-width: 75em) {
+
+}
+
+/* ----------------------------------------------------------- */
+/* SINGLE PROPERTY CLASSES */
+
+/* ----------------------------------------------------------- */
+/* FLEX */
+
+.flex {
+  display: flex;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+/* ----------------------------------------------------------- */
+/* ALIGN ITEMS */
+
+.items-start {
+  align-items: start;
+}
+
+.items-end {
+  align-items: end;
+}
+
+.items-center {
+  align-items: center;
+}
+
+/* ----------------------------------------------------------- */
+/* JUSTIFY CONTENT */
+
+.justify-start {
+  justify-content: start;
+}
+
+.justify-end {
+  justify-content: end;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+/* ----------------------------------------------------------- */
+/* GAP */
+
+.gap-1 {
+  gap: 1rem;
+}
+
+.gap-1-5 {
+  gap: 1.5rem;
+}
+
+.gap-2 {
+  gap: 2rem;
+}
+
+.gap-2-5 {
+  gap: 2.5rem;
+}
+
+.gap-3 {
+  gap: 3rem;
+}
