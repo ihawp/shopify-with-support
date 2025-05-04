@@ -41,14 +41,14 @@ class SocketInterface {
                 role = decoded.role || 'guest';
                 room = role === 'admin' ? 'admin' : room;
 
-                console.log(role);
-
                 socket.join(room);
 
                 // Dont update
                 // Or do, but don't change rooms or anything like that (it is important that each user can retain their session as long as their cookie lasts.)
 
                 UserDirector.addUser(room, { room: room, role: role });
+
+                this.emitToRoom('admin', 'update-users', UserDirector.getAllUsers());
 
                 this.io.emit('user-join', UserDirector.getAllUsers().length);
 
@@ -57,19 +57,17 @@ class SocketInterface {
                 });
 
                 socket.on('change-room', (newRoom) => {
-                    if (role === 'admin') {
-                        socket.leave(room);
-                        room = newRoom;
-                        socket.join(newRoom);
-                    } else {
-                        socket.disconnect();
-                    }
+                    if (role !== 'admin') socket.disconnect();
+                    if (room !== 'admin') socket.leave(room);
+                    room = newRoom;
+                    socket.join(newRoom);
                 });
 
                 socket.on('disconnect', () => {
                     if (UserDirector.userExists(room)) {
                         UserDirector.removeUserBySocketId(room);
                         this.io.emit('user-leave', UserDirector.getAllUsers().length);
+                        this.io.emit('update-users', UserDirector.getAllUsers());
                     }
                 });
             });
