@@ -48,12 +48,12 @@ class SocketInterface {
                 // Dont update
                 // Or do, but don't change rooms or anything like that (it is important that each user can retain their session as long as their cookie lasts.)
 
-                UserDirector.addUser(socket.id, { socket: socket.id, room: room, role: role });
+                UserDirector.addUser(room, { room: room, role: role });
 
                 this.io.emit('user-join', UserDirector.getAllUsers().length);
 
                 socket.on('message', (data) => {
-                    this.emitToRoom(room, 'message', { user: socket.id, message: data });
+                    this.emitToRoom(room, 'message', { user: role, message: data });
                 });
 
                 socket.on('change-room', (newRoom) => {
@@ -67,8 +67,8 @@ class SocketInterface {
                 });
 
                 socket.on('disconnect', () => {
-                    if (UserDirector.userExists(socket.id)) {
-                        UserDirector.removeUserBySocketId(socket.id);
+                    if (UserDirector.userExists(room)) {
+                        UserDirector.removeUserBySocketId(room);
                         this.io.emit('user-leave', UserDirector.getAllUsers().length);
                     }
                 });

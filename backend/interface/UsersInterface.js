@@ -1,36 +1,37 @@
 class UsersInterface {
-    constructor() {
-      this.users = new Map();
-    }
-  
-    addUser(socketId, data) {
-      this.users.set(socketId, data);
-    }
-  
-    removeUserBySocketId(socketId) {
-      this.users.delete(socketId);
-    }
+  constructor() {
+    this.users = new Map();
+  }
 
-    updateUser(socketId, data) {
-      if (this.users.has(socketId)) {
-        this.users.set(socketId, data);
-      } else {
-        return 0;
-      }
-    }
+  addUser(socketId, { room, role }) {
+    const userData = { room, role };
+    this.users.set(socketId, userData);
+  }
 
-    getUserData(socketId) {
-      return this.users.get(socketId);
-    }
-  
-    userExists(socketId) {
-      return this.users.has(socketId);
-    }
-  
-    getAllUsers() {
-      return Array.from(this.users.entries());
+  removeUserBySocketId(socketId) {
+    this.users.delete(socketId);
+  }
+
+  updateUser(socketId, { room, role }) {
+    if (this.users.has(socketId)) {
+      const updatedData = { room, role };
+      this.users.set(socketId, updatedData);
+    } else {
+      return 0;
     }
   }
-  
-  module.exports = UsersInterface;
-  
+
+  getUserData(socketId) {
+    return this.users.get(socketId);
+  }
+
+  userExists(socketId) {
+    return this.users.has(socketId);
+  }
+
+  getAllUsers() {
+    return Array.from(this.users.entries());
+  }
+}
+
+module.exports = UsersInterface;
