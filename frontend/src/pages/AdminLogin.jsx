@@ -5,7 +5,6 @@ export default function AdminLogin() {
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [token, setToken] = useState(null);
 
     const navigate = useNavigate();
 
@@ -20,6 +19,7 @@ export default function AdminLogin() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify(data),
             });
 
@@ -28,13 +28,10 @@ export default function AdminLogin() {
             }
 
             let responseData = await response.json();
-            console.log(responseData);
 
-            if (responseData.token) {
-                setToken(responseData.token);
-                localStorage.setItem('jwt', responseData.token);
+            if (responseData) {
+                setLoading(false);
                 navigate('/support');
-                window.location.reload();
             } else {
                 setError('No token received');
             }
@@ -74,7 +71,6 @@ export default function AdminLogin() {
                 </form>
                 {loading && <p>Loading...</p>}
                 {error && <p style={{ color: 'red' }}>{error}</p>}
-                {token && <p>Login successful! Token: {token}</p>}
             </section>
         </main>
     );

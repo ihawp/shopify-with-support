@@ -1,6 +1,13 @@
 import { NavLink } from "react-router-dom";
 
+import { useEffect, useContext } from 'react';
+
+import { SocketContext } from "../middleware/SocketProvider";
+
 export default function Header() {
+
+    const { users } = useContext(SocketContext);
+
     return <header>
         <nav>
             <ul>
@@ -18,5 +25,9 @@ export default function Header() {
                 </li>
             </ul>
         </nav>
+        <div>
+            <span>Users Online:</span>
+            <span>{users}</span>
+        </div>
     </header>;
 }
