@@ -144,16 +144,6 @@ function isValidEmailFormat(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-async function hasValidMX(email) {
-  try {
-    const domain = email.split('@')[1];
-    const mxRecords = await dns.resolveMx(domain);
-    return mxRecords && mxRecords.length > 0;
-  } catch (err) {
-    return false;
-  }
-}
-
 app.post('/create-customer', async (req, res) => {
   const { email } = req.body;
 
