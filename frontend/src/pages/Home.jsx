@@ -3,6 +3,8 @@ import { client } from '../middleware/ShopifyProvider.jsx';
 
 import Product from '../components/Product.jsx';
 
+import EmailEntry from '../components/EmailEntry.jsx';
+
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [endCursor, setEndCursor] = useState(null);
@@ -68,8 +70,7 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  return (
-    <main>
+  return <main>
       <header>
         <h1>Home Page</h1>
       </header>
@@ -86,6 +87,7 @@ export default function Home() {
           {loading ? 'Loading...' : 'Load More'}
         </button>
       )}
-    </main>
-  );
+
+      <EmailEntry />
+    </main>;
 }

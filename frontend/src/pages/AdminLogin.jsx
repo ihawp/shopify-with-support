@@ -32,6 +32,7 @@ export default function AdminLogin() {
             if (responseData) {
                 setLoading(false);
                 navigate('/support');
+                window.location.reload();
             } else {
                 setError('No token received');
             }

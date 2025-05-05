@@ -8,6 +8,7 @@ import Cart from './pages/Cart';
 import Product from './pages/Product';
 import Privacy from './pages/Privacy';
 import AdminLogin from './pages/AdminLogin';
+import Search from './pages/Search';
 
 // Components
 import Header from './components/Header';
@@ -34,6 +35,8 @@ export default function App() {
         <Route path='/support' element={ <Support /> } />
         <Route path='/cart' element={ <Cart /> } />
         <Route path='/product/:id' element={ <Product /> } />
+
+        <Route path='/search/:query' element={ <Search /> } />
 
         <Route path='/privacy' element={ <Privacy /> } />
 

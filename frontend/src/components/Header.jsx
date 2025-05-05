@@ -1,12 +1,18 @@
 import { NavLink } from "react-router-dom";
 
-import { useEffect, useContext } from 'react';
+import SearchBar from "../components/SearchBar";
+
+import { useContext } from 'react';
 
 import { SocketContext } from "../middleware/SocketProvider";
+
+import { CartContext } from "../middleware/CartProvider";
 
 export default function Header() {
 
     const { users } = useContext(SocketContext);
+
+    const { cartItems } = useContext(CartContext);
 
     return <header>
         <nav>
@@ -19,6 +25,7 @@ export default function Header() {
                 </li>
                 <li>
                     <NavLink to="/cart" title="Cart" aria-label="Home Navigation Button">Cart</NavLink>
+                    <span>{cartItems.length || null}</span>
                 </li>
                 <li>
                     <NavLink to="/privacy" title="Privacy Policy" aria-label="Home Navigation Button">Privacy</NavLink>
@@ -26,8 +33,9 @@ export default function Header() {
             </ul>
         </nav>
         <div>
-            <span>Users Online:</span>
+            <span>Shoppers Online:</span>
             <span>{users}</span>
         </div>
+        <SearchBar />
     </header>;
 }

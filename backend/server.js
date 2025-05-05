@@ -10,6 +10,8 @@ const cookieParser = require('cookie-parser');
 const winston = require('winston');
 const nodemailer = require('nodemailer');
 
+const { SHOPIFY_ADMIN_API_URL, ADMIN_API_TOKEN } = require('./keys.js');
+
 const app = express();
 
 const corsOptions = {
@@ -45,7 +47,6 @@ const SocketDirector = new SocketInterface(server, UserDirector);
 app.use(express.json());
 app.use(cookieParser());
 
-
 function checkAdminToken(req, res, next) {
   const token = req.cookies.token;
 
@@ -62,7 +63,6 @@ function checkAdminToken(req, res, next) {
 
   next();
 }
-
 
 function checkValidGuestToken(req, res, next) {
   const token = req.cookies.token;
@@ -138,6 +138,93 @@ const verifyJWT = (req, res, next) => {
       next();
   });
 };
+
+function isValidEmailFormat(email) {
+  // Very simple and safe regex for email format validation
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+async function hasValidMX(email) {
+  try {
+    const domain = email.split('@')[1];
+    const mxRecords = await dns.resolveMx(domain);
+    return mxRecords && mxRecords.length > 0;
+  } catch (err) {
+    return false;
+  }
+}
+
+app.post('/create-customer', async (req, res) => {
+  const { email } = req.body;
+
+  let isValidEmail = isValidEmailFormat(email);
+
+  if (!isValidEmail) return res.status(400).json({ userErrors: 'Not An Email.' });
+
+  // Use (dns) to verify if email is sendable to.
+  // dns has plenty of deprecated tech.
+  // need alternate plan.
+
+  const mutation = `
+  mutation customerCreate($input: CustomerInput!) {
+    customerCreate(input: $input) {
+      customer {
+        id
+        email
+        createdAt
+        emailMarketingConsent {
+          marketingState
+          marketingOptInLevel
+          consentUpdatedAt
+        }
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    email: email,
+    emailMarketingConsent: {
+      marketingState: "SUBSCRIBED",
+      marketingOptInLevel: "SINGLE_OPT_IN",
+      consentUpdatedAt: new Date().toISOString(),
+    },
+  },
+};
+
+
+try {
+    const response = await fetch(SHOPIFY_ADMIN_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Shopify-Access-Token': ADMIN_API_TOKEN,
+          },
+          body: JSON.stringify({ query: mutation, variables }),
+    });
+
+    const data = await response.json();
+
+    const { customerCreate } = data.data;
+
+    console.log(customerCreate);
+
+    if (customerCreate?.userErrors.length > 0) {
+      return res.status(400).json({ userErrors: customerCreate.userErrors });
+    }
+
+    return res.status(200).json({ success: true, customer: customerCreate.customer });
+  } catch (err) {
+    console.error('Admin API request failed:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 /* ADMIN PROTECTED */
 app.get('/getUsers', verifyJWT, (req, res) => {
