@@ -56,22 +56,27 @@ class SocketInterface {
                 }
 
                 const role = decoded.role || 'guest';
-                const room = role === 'admin' ? 'admin' : decoded.room;
+
+                // this is an issue
+                // room needs to be const to remain defined within the 
+                const roomRef = {
+                    current: role === 'admin' ? 'admin' : decoded.room
+                };
 
                 // Query for past messages and emit them to the user
                 const conn = await mysql.createConnection(dbConnect);
                 const messages = await dbQuery(conn,
                     'SELECT * FROM `support-messages` WHERE room = ?',
-                    [room]
+                    [roomRef.current]
                 );
 
                 if (messages) {
                     socket.emit('past-messages', { messages });
                 }
 
-                socket.join(room);
+                socket.join(roomRef.current);
 
-                UserDirector.addUser(room, { room: room, role: role });
+                UserDirector.addUser(roomRef.current, { room: roomRef.current, role: role });
 
                 this.emitToRoom('admin', 'update-users', UserDirector.getAllUsers());
 
@@ -81,26 +86,40 @@ class SocketInterface {
 
                     const newTimestamp = formatTimestamp(decoded.exp);
 
-                    const uploadMessage = await dbQuery(conn, 
+                    const uploadMessage = await dbQuery(conn,
                         'INSERT INTO `support-messages` (room, user, message, `delete-after`) VALUES (?, ?, ?, ?)', 
-                        [room, role, data, newTimestamp]
+                        [roomRef.current, role, data, newTimestamp]
                     );
 
                     if (uploadMessage) {
-                        this.emitToRoom(room, 'message', { user: role, message: data });
+                        this.emitToRoom(roomRef.current, 'message', { user: role, message: data });
                     }
+                    // else send error
                 });
 
-                socket.on('change-room', (newRoom) => {
+                socket.on('change-room', async (newRoom) => {
                     if (role !== 'admin') socket.disconnect();
-                    if (room !== 'admin') socket.leave(room);
-                    room = newRoom;
+                
+                    if (roomRef.current !== 'admin') {
+                        socket.leave(roomRef.current);
+                    }
+                
+                    const newMessages = await dbQuery(conn,
+                        'SELECT * FROM `support-messages` WHERE room = ?',
+                        [newRoom]
+                    );
+                
+                    if (newMessages) {
+                        socket.emit('past-messages', { messages: newMessages });
+                    }
+                
+                    roomRef.current = newRoom;
                     socket.join(newRoom);
                 });
 
                 socket.on('disconnect', () => {
-                    if (UserDirector.userExists(room)) {
-                        UserDirector.removeUserBySocketId(room);
+                    if (UserDirector.userExists(roomRef.current)) {
+                        UserDirector.removeUserBySocketId(roomRef.current);
                         this.io.emit('user-leave', UserDirector.getAllUsers().length);
                         this.io.emit('update-users', UserDirector.getAllUsers());
                     }
