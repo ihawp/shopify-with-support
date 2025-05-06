@@ -1,9 +1,22 @@
 const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const cookie = require('cookie');
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
+const dbConnect = require('../middleware/dbConnect.js');
 
-//
+const formatTimestamp = require('../middleware/formatTimestamp.js');
+
+const dbQuery = async (conn, queryString, bindParam) => {
+    try {
+        const [results] = await conn.execute(
+            queryString,
+            bindParam
+        );
+        if (results) return results;
+    } catch (error) {
+        return false;
+    }
+}
 
 class SocketInterface {
     constructor(httpServer, UserDirector) {
@@ -11,14 +24,13 @@ class SocketInterface {
             cors: {
                 origin: "http://localhost:5173",
                 methods: ["GET", "POST"],
-                credentials: true,  // Allow cookies to be sent with WebSocket requests
+                credentials: true,
             },
         });
 
         this.io.on('connection', (socket) => {
 
             let verifier = 'user-secret-token';
-            let role = 'guest';
 
             // Here we parse the requests cookies
             // And retrieve a token if one exists
@@ -32,19 +44,30 @@ class SocketInterface {
             }
 
             // Use decode (allows access to key pair values stored in jwt without verifying the jwt with a secret token) to try admin checking (change verifier to admin-secret-token)
-            let insecureDecoded = jwt.decode(token);
+            const insecureDecoded = jwt.decode(token);
             if (insecureDecoded && insecureDecoded?.role === 'admin') verifier = 'admin-secret-token';
 
             // Use jwt verify on the proper verifier (this could likely be reduced or functionality brought from elsewhere, but I think it's important it remains inline in this context without having to pass params)
-            jwt.verify(token, verifier, (err, decoded) => {
+            jwt.verify(token, verifier, async (err, decoded) => {
                 if (err) {
                     socket.emit('auth-error', 'Invalid or expired token.');
                     socket.disconnect();
                     return;
                 }
 
-                role = decoded.role || 'guest';
-                let room = role === 'admin' ? 'admin' : decoded.room;
+                const role = decoded.role || 'guest';
+                const room = role === 'admin' ? 'admin' : decoded.room;
+
+                // Query for past messages and emit them to the user
+                const conn = await mysql.createConnection(dbConnect);
+                const messages = await dbQuery(conn,
+                    'SELECT * FROM `support-messages` WHERE room = ?',
+                    [room]
+                );
+
+                if (messages) {
+                    socket.emit('past-messages', { messages });
+                }
 
                 socket.join(room);
 
@@ -54,16 +77,18 @@ class SocketInterface {
 
                 this.io.emit('user-join', UserDirector.getAllUsers().length);
 
-                socket.on('message', (data) => {
+                socket.on('message', async (data) => {
 
-                    // so we receive a message
-                    // we know the role of this user from above
-                    // we can upload to db: the message, who sent it ('guest' or 'admin'), the room, timestamp
-                    // use mysql 2 for now (with XAMPP)
+                    const newTimestamp = formatTimestamp(decoded.exp);
 
-                    // ...
+                    const uploadMessage = await dbQuery(conn, 
+                        'INSERT INTO `support-messages` (room, user, message, `delete-after`) VALUES (?, ?, ?, ?)', 
+                        [room, role, data, newTimestamp]
+                    );
 
-                    this.emitToRoom(room, 'message', { user: role, message: data });
+                    if (uploadMessage) {
+                        this.emitToRoom(room, 'message', { user: role, message: data });
+                    }
                 });
 
                 socket.on('change-room', (newRoom) => {
