@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const cookie = require('cookie');
 const mysql = require('mysql2/promise');
 const dbConnect = require('../middleware/dbConnect.js');
+const nodeCron = require('node-cron');
 
 const formatTimestamp = require('../middleware/formatTimestamp.js');
 
@@ -17,6 +18,22 @@ const dbQuery = async (conn, queryString, bindParam) => {
         return false;
     }
 }
+
+async function clearExpiredMessages() {
+    try {
+        const conn = await mysql.createConnection(dbConnect);
+        const [results] = await conn.execute(
+            'DELETE FROM `support-messages` WHERE `delete-after` < NOW() AND `user` != "admin"'
+        );
+        console.log(`Deleted ${results.affectedRows} expired messages.`);
+        await conn.end();
+    } catch (error) {
+        console.error('Error clearing expired messages:', error);
+    }
+}
+
+// Every hour at the beginning of the hour
+nodeCron.schedule('0 * * * *', clearExpiredMessages);
 
 class SocketInterface {
     constructor(httpServer, UserDirector) {
@@ -76,11 +93,24 @@ class SocketInterface {
 
                 socket.join(roomRef.current);
 
-                UserDirector.addUser(roomRef.current, { room: roomRef.current, role: role });
+                function generateRandomName() {
+                    const adjectives = ['cool', 'fast', 'quiet', 'bright', 'smart'];
+                    const nouns = ['tiger', 'falcon', 'gecko', 'panda', 'fox'];
+                    const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
+                    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+                    const randomNum = Math.floor(Math.random() * 1000);
+                    return `${randomAdj}-${randomNoun}-${randomNum}`;
+                }
 
-                this.emitToRoom('admin', 'update-users', UserDirector.getAllUsers());
+                const userIdentifier = generateRandomName() + socket.id.split(4, 8);
 
-                this.io.emit('user-join', UserDirector.getAllUsers().length);
+                UserDirector.addUser(userIdentifier, { room: roomRef.current, role: role });
+
+                const getAllUsers = UserDirector.getAllUsers();
+
+                this.emitToRoom('admin', 'update-users', getAllUsers);
+
+                this.io.emit('user-join', getAllUsers.length);
 
                 socket.on('message', async (data) => {
 
@@ -118,8 +148,8 @@ class SocketInterface {
                 });
 
                 socket.on('disconnect', () => {
-                    if (UserDirector.userExists(roomRef.current)) {
-                        UserDirector.removeUserBySocketId(roomRef.current);
+                    if (UserDirector.userExists(userIdentifier)) {
+                        UserDirector.removeUserBySocketId(userIdentifier);
                         this.io.emit('user-leave', UserDirector.getAllUsers().length);
                         this.io.emit('update-users', UserDirector.getAllUsers());
                     }
