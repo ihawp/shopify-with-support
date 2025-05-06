@@ -1,42 +1,25 @@
 const express = require('express');
 const http = require('http');
-const { Server } = require('socket.io');
-const jwt = require('jsonwebtoken');
-const mysql2 = require('mysql2');
 const cors = require('cors');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 const createCustomer = require('./middleware/createCustomer.js');
+const checkAdminToken = require('./middleware/checkAdminToken.js');
+const checkValidGuestToken = require('./middleware/checkValidGuestToken.js');
+const issueGuestToken = require('./middleware/issueGuestToken.js');
+const setHeader = require('./middleware/setHeader.js');
+const corsOptions = require('./middleware/corsOptions');
+const adminCredentials = require('./middleware/adminCredentials.js');
+const verifyJWT = require('./middleware/verifyJWT.js');
 
+// Yet to implement
 const winston = require('winston');
 const nodemailer = require('nodemailer');
+const mysql2 = require('mysql2');
 
 const app = express();
-
-const corsOptions = {
-  origin: 'http://localhost:5173',
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'Authorization'], 
-  credentials: true
-};
-app.use(cors(corsOptions));
-
-app.use(helmet());
-
-const setHeader = (req, res, next) => {
-  res.setHeader("Content-Security-Policy", 
-    "default-src 'self'; " +
-    "script-src 'self'; " +
-    "style-src 'self' 'unsafe-inline'; " +
-    "object-src 'none'; " +
-    "connect-src 'self'; " +
-    "img-src 'self' data:;"
-  );
-  next();
-}
-
-app.use(setHeader);
 
 const server = http.createServer(app);
 
@@ -46,67 +29,13 @@ const UserDirector = new UsersInterface();
 const SocketInterface = require('./interface/SocketInterface.js');
 const SocketDirector = new SocketInterface(server, UserDirector);
 
+app.use(cors(corsOptions));
+app.use(helmet());
+app.use(setHeader);
 app.use(express.json());
 app.use(cookieParser());
 
-function checkAdminToken(req, res, next) {
-  const token = req.cookies.token;
-
-  if (!token) return next();
-
-  try {
-    const decoded = jwt.decode(token);
-    if (decoded?.role === 'admin') {
-      jwt.verify(token, 'admin-secret-token', (err, decoded) => {
-
-        console.log(err);
-
-        if (decoded.role === 'admin') return res.json({ message: 'is-admin' });
-      });
-    }
-  } catch (err) {
-    // Fall through
-  }
-
-  next();
-}
-
-function checkValidGuestToken(req, res, next) {
-  const token = req.cookies.token;
-
-  if (!token) return next();
-
-  jwt.verify(token, 'user-secret-token', (err) => {
-    if (!err) {
-      return res.json({ message: 'valid guest' });
-    }
-    next();
-  });
-}
-
-function issueGuestToken(req, res) {
-  const newToken = jwt.sign(
-    { room: `${Date.now()}_guest`, role: 'guest' },
-    'user-secret-token',
-    { expiresIn: '1h' }
-  );
-
-  res.cookie('token', newToken, {
-    httpOnly: true,
-    secure: false,
-    maxAge: 60 * 60 * 1000,
-    sameSite: 'strict',
-  });
-
-  return res.json({ message: 'new guest issued' });
-}
-
 app.get('/user-login', checkAdminToken, checkValidGuestToken, issueGuestToken);
-
-const adminCredentials = {
-  username: 'root',
-  password: 'root'
-};
 
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
@@ -129,26 +58,9 @@ app.post('/login', (req, res) => {
   }
 });
 
-const verifyJWT = (req, res, next) => {
-
-  let token = req.cookies.token;
-
-  if (!token) {
-      return res.status(403).json({ message: 'Token required' });
-  }
-
-  jwt.verify(token, 'admin-secret-token', (err, decoded) => {
-      if (err) {
-          return res.status(401).json({ message: err.message });
-      }
-
-      next();
-  });
-};
-
+/* ADMIN PROTECTED */
 app.post('/create-customer', createCustomer);
 
-/* ADMIN PROTECTED */
 app.get('/getUsers', verifyJWT, (req, res) => {
   let usersWithRooms = UserDirector.getAllUsers();
   res.json(usersWithRooms); 

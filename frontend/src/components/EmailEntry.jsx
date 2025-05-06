@@ -26,6 +26,10 @@ export default function EmailEntry() {
         body: JSON.stringify({ email }),
       });
   
+      if (!res.ok) {
+        return setMessage('Something went wrong please try again.');
+      }
+
       const data = await res.json();
   
       if (data) {

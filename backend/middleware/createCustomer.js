@@ -1,18 +1,7 @@
 const isValidEmailFormat = require("./isValidEmailFormat");
-const { SHOPIFY_ADMIN_API_URL } = require('../keys.js');
+const { SHOPIFY_ADMIN_API_URL, ADMIN_API_TOKEN } = require('../keys.js');
 
-const createCustomer = async (req, res) => {
-    const { email } = req.body;
-  
-    let isValidEmail = isValidEmailFormat(email);
-  
-    if (!isValidEmail) return res.status(400).json({ userErrors: 'Not An Email.' });
-  
-    // Use (dns) to verify if email is sendable to.
-    // dns has plenty of deprecated tech.
-    // need alternate plan.
-  
-    const mutation = `
+const mutation = `
     mutation customerCreate($input: CustomerInput!) {
       customerCreate(input: $input) {
         customer {
@@ -31,19 +20,30 @@ const createCustomer = async (req, res) => {
         }
       }
     }
-  `;
+`;
+
+const createCustomer = async (req, res) => {
+  const { email } = req.body;
+
+  console.log(email);
+
+  // sanitize
+  
+  // Check regex
+  let isValidEmail = isValidEmailFormat(email);
+  
+  if (!isValidEmail) return res.status(400).json({ userErrors: 'Not An Email.' });
   
   const variables = {
-    input: {
-      email: email,
-      emailMarketingConsent: {
-        marketingState: "SUBSCRIBED",
-        marketingOptInLevel: "SINGLE_OPT_IN",
-        consentUpdatedAt: new Date().toISOString(),
+      input: {
+        email: email,
+        emailMarketingConsent: {
+          marketingState: "SUBSCRIBED",
+          marketingOptInLevel: "SINGLE_OPT_IN",
+          consentUpdatedAt: new Date().toISOString(),
+        },
       },
-    },
   };
-  
   
   try {
       const response = await fetch(SHOPIFY_ADMIN_API_URL, {
@@ -59,6 +59,7 @@ const createCustomer = async (req, res) => {
   
       const { customerCreate } = data.data;
   
+      // email prints as null ?? it is still uploaded to customers table.
       console.log(customerCreate);
   
       if (customerCreate?.userErrors.length > 0) {

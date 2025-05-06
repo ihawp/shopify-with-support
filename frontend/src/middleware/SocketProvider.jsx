@@ -90,26 +90,7 @@ export default function SocketProvider({ children }) {
 
         loginStatus();
 
-    }, []);    
-
-    useEffect(() => {
-        getUsersCount();
     }, []);
-
-    const getUsersCount = async () => {
-        let response = await fetch('http://localhost:3000/getUsersCount', {
-            method: "GET",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
-
-        let data = await response.json();
-
-        if (data) {
-            setUsers(data.count);
-        }
-    }
 
     const changeRoom = (room) => {
         socketRef.current?.emit('change-room', room);
