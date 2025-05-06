@@ -47,6 +47,9 @@ class SocketInterface {
 
         this.io.on('connection', (socket) => {
 
+            // ALL OF THIS NEEDS TO BE CLEANED UP
+            // BUT THE LOGIC IS WORKING SMOOTHLY
+
             let verifier = 'user-secret-token';
 
             // Here we parse the requests cookies
