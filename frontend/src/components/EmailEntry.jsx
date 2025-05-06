@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { client } from '../middleware/ShopifyProvider';
+import ServerURL from '../middleware/ServerURL';
 
 export default function EmailEntry() {
 
@@ -20,7 +21,7 @@ export default function EmailEntry() {
     }
   
     try {
-      const res = await fetch('http://localhost:3000/create-customer', {
+      const res = await fetch(ServerURL + '/create-customer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),

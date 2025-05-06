@@ -8,25 +8,47 @@ export default function SocketProvider({ children }) {
     const messageHandlerRef = useRef();
 
     const [messages, setMessages] = useState([]);
-
-    const [auth, setAuth] = useState(false);
+    const [auth, setAuth] = useState(null);
 
     const [users, setUsers] = useState([]);
-
     const [newUsers, setNewUsers] = useState([]);
 
-    // Store a ref to the latest handler
     messageHandlerRef.current = (rec) => {
         const { user, message } = rec;
         setMessages(prev => [...prev, { user, message }]);
     };
 
     useEffect(() => {
+        const doUserLogin = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/user-login', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                });
 
+                if (!response.ok) throw new Error('Auth failed');
+
+                const data = await response.json();
+
+                const result = data?.message === 'is-admin' ? 'is-admin' : true;
+
+                setAuth(result);
+            } catch {
+                setAuth(false);
+            }
+        };
+
+        doUserLogin();
+    }, []);
+
+    useEffect(() => {
         if (!auth || socketRef.current) return;
 
         socketRef.current = io('http://localhost:3000', {
-            withCredentials: true
+            withCredentials: true,
         });
 
         socketRef.current.on('connect', () => {
@@ -56,45 +78,11 @@ export default function SocketProvider({ children }) {
         });
 
         return () => socketRef.current.disconnect();
-
     }, [auth]);
-
-    useEffect(() => {
-        const doUserLogin = async () => {
-            let response = await fetch('http://localhost:3000/user-login', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include'
-            });
-    
-            let data = await response.json();
-
-            if (data && data.message) {
-
-                if (data.message === 'is-admin') {
-                    return 'is-admin';
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-        const loginStatus = async () => {
-            const result = await doUserLogin();
-            setAuth(result);
-        };
-
-        loginStatus();
-
-    }, []);
 
     const changeRoom = (room) => {
         socketRef.current?.emit('change-room', room);
-    }
+    };
 
     const sendMessage = (message) => {
         socketRef.current?.emit('message', message);

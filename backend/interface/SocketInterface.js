@@ -13,24 +13,39 @@ class SocketInterface {
         });
 
         this.io.on('connection', (socket) => {
+
+
+            // PLAN:
+            // Rework logic so that a user that reconnects is given the same room id (date.now + '_guest')
+            // This is important as it will allow the frontend a better overall experience.
+            // Users will be able to rejoin their chat upon reload, their chat is active as long as their JWT (1h)
+
+            // We set 3 variables that outline the most likely values required (guest values)
+            // verifier = the secret token used to encrypt the JWT
+            // role = guest (they are likely a guest)
+            // Move the room instantiation to inside the verifier since we are checking for token existing
+            // and so it should exist and they should have their own room identifier.
+            // We can still add and remove arrays based on who is actually online, not just open sessions.
+            // The guest sessions can remain open as XSS is unlikely.
             let verifier = 'user-secret-token';
-            let room = `${Date.now()}_guest`;
             let role = 'guest';
 
+            // Here we parse the requests cookies
+            // And retrieve a token if one exists
             const cookies = cookie.parse(socket.request.headers.cookie || '');
-            const token = cookies.token;
+            const token = cookies?.token;
 
+            // Force user to want to reload page so that they can retrieve auth and chat with support admin
             if (!token) {
                 socket.emit('auth-error', 'disconnecting because no auth');
                 socket.disconnect();
             }
 
-            let decoded = jwt.decode(token);
+            // Use decode (unsecure) to try admin checking (change verifier to admin-secret-token)
+            let insecureDecoded = jwt.decode(token);
+            if (insecureDecoded && insecureDecoded?.role === 'admin') verifier = 'admin-secret-token';
 
-            if (decoded && decoded.role === 'admin') {
-                verifier = 'admin-secret-token';
-            }
-
+            // Use jwt verify on the proper verifier (this could likely be reduced or functionality brought from elsewhere, but I think it's important it remains inline in this context without having to pass params)
             jwt.verify(token, verifier, (err, decoded) => {
                 if (err) {
                     socket.emit('auth-error', 'Invalid or expired token.');
@@ -39,12 +54,9 @@ class SocketInterface {
                 }
 
                 role = decoded.role || 'guest';
-                room = role === 'admin' ? 'admin' : room;
+                let room = role === 'admin' ? 'admin' : decoded.room;
 
                 socket.join(room);
-
-                // Dont update
-                // Or do, but don't change rooms or anything like that (it is important that each user can retain their session as long as their cookie lasts.)
 
                 UserDirector.addUser(room, { room: room, role: role });
 

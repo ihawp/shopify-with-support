@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ServerURL from '../middleware/ServerURL';
 
 export default function AdminLogin() {
     const [data, setData] = useState(null);
@@ -14,7 +15,7 @@ export default function AdminLogin() {
         setError(null); // Reset any previous errors
 
         try {
-            let response = await fetch('http://localhost:3000/login', {
+            let response = await fetch(ServerURL + '/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
