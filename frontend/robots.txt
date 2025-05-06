@@ -1,0 +1,5 @@
+UserAgent: *
+
+Allow: /
+
+Disallow: /assets
