@@ -61,7 +61,7 @@ class SocketInterface {
                     // we can upload to db: the message, who sent it ('guest' or 'admin'), the room, timestamp
                     // use mysql 2 for now (with XAMPP)
 
-                    
+                    // ...
 
                     this.emitToRoom(room, 'message', { user: role, message: data });
                 });
