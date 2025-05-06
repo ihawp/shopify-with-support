@@ -1,6 +1,9 @@
 const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const cookie = require('cookie');
+const mysql = require('mysql2');
+
+//
 
 class SocketInterface {
     constructor(httpServer, UserDirector) {
@@ -14,19 +17,6 @@ class SocketInterface {
 
         this.io.on('connection', (socket) => {
 
-
-            // PLAN:
-            // Rework logic so that a user that reconnects is given the same room id (date.now + '_guest')
-            // This is important as it will allow the frontend a better overall experience.
-            // Users will be able to rejoin their chat upon reload, their chat is active as long as their JWT (1h)
-
-            // We set 3 variables that outline the most likely values required (guest values)
-            // verifier = the secret token used to encrypt the JWT
-            // role = guest (they are likely a guest)
-            // Move the room instantiation to inside the verifier since we are checking for token existing
-            // and so it should exist and they should have their own room identifier.
-            // We can still add and remove arrays based on who is actually online, not just open sessions.
-            // The guest sessions can remain open as XSS is unlikely.
             let verifier = 'user-secret-token';
             let role = 'guest';
 
@@ -41,7 +31,7 @@ class SocketInterface {
                 socket.disconnect();
             }
 
-            // Use decode (unsecure) to try admin checking (change verifier to admin-secret-token)
+            // Use decode (allows access to key pair values stored in jwt without verifying the jwt with a secret token) to try admin checking (change verifier to admin-secret-token)
             let insecureDecoded = jwt.decode(token);
             if (insecureDecoded && insecureDecoded?.role === 'admin') verifier = 'admin-secret-token';
 
@@ -65,6 +55,14 @@ class SocketInterface {
                 this.io.emit('user-join', UserDirector.getAllUsers().length);
 
                 socket.on('message', (data) => {
+
+                    // so we receive a message
+                    // we know the role of this user from above
+                    // we can upload to db: the message, who sent it ('guest' or 'admin'), the room, timestamp
+                    // use mysql 2 for now (with XAMPP)
+
+                    
+
                     this.emitToRoom(room, 'message', { user: role, message: data });
                 });
 
