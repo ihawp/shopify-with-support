@@ -59,6 +59,10 @@ export default function SocketProvider({ children }) {
             messageHandlerRef.current?.(rec);
         });
 
+        socketRef.current.on('past-messages', (messages) => {
+            console.log(messages)
+        });
+
         socketRef.current.on('auth-error', (message) => {
             console.log(message);
         });

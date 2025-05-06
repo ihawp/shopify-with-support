@@ -1,9 +1,39 @@
 const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const cookie = require('cookie');
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
+const dbConnect = require('../middleware/dbConnect.js');
+const nodeCron = require('node-cron');
 
-//
+const formatTimestamp = require('../middleware/formatTimestamp.js');
+
+const dbQuery = async (conn, queryString, bindParam) => {
+    try {
+        const [results] = await conn.execute(
+            queryString,
+            bindParam
+        );
+        if (results) return results;
+    } catch (error) {
+        return false;
+    }
+}
+
+async function clearExpiredMessages() {
+    try {
+        const conn = await mysql.createConnection(dbConnect);
+        const [results] = await conn.execute(
+            'DELETE FROM `support-messages` WHERE `delete-after` < NOW() AND `user` != "admin"'
+        );
+        console.log(`Deleted ${results.affectedRows} expired messages.`);
+        await conn.end();
+    } catch (error) {
+        console.error('Error clearing expired messages:', error);
+    }
+}
+
+// Every hour at the beginning of the hour
+nodeCron.schedule('0 * * * *', clearExpiredMessages);
 
 class SocketInterface {
     constructor(httpServer, UserDirector) {
@@ -11,14 +41,16 @@ class SocketInterface {
             cors: {
                 origin: "http://localhost:5173",
                 methods: ["GET", "POST"],
-                credentials: true,  // Allow cookies to be sent with WebSocket requests
+                credentials: true,
             },
         });
 
         this.io.on('connection', (socket) => {
 
+            // ALL OF THIS NEEDS TO BE CLEANED UP
+            // BUT THE LOGIC IS WORKING SMOOTHLY
+
             let verifier = 'user-secret-token';
-            let role = 'guest';
 
             // Here we parse the requests cookies
             // And retrieve a token if one exists
@@ -32,50 +64,95 @@ class SocketInterface {
             }
 
             // Use decode (allows access to key pair values stored in jwt without verifying the jwt with a secret token) to try admin checking (change verifier to admin-secret-token)
-            let insecureDecoded = jwt.decode(token);
+            const insecureDecoded = jwt.decode(token);
             if (insecureDecoded && insecureDecoded?.role === 'admin') verifier = 'admin-secret-token';
 
             // Use jwt verify on the proper verifier (this could likely be reduced or functionality brought from elsewhere, but I think it's important it remains inline in this context without having to pass params)
-            jwt.verify(token, verifier, (err, decoded) => {
+            jwt.verify(token, verifier, async (err, decoded) => {
                 if (err) {
                     socket.emit('auth-error', 'Invalid or expired token.');
                     socket.disconnect();
                     return;
                 }
 
-                role = decoded.role || 'guest';
-                let room = role === 'admin' ? 'admin' : decoded.room;
+                const role = decoded.role || 'guest';
 
-                socket.join(room);
+                // this is an issue
+                // room needs to be const to remain defined within the 
+                const roomRef = {
+                    current: role === 'admin' ? 'admin' : decoded.room
+                };
 
-                UserDirector.addUser(room, { room: room, role: role });
+                // Query for past messages and emit them to the user
+                const conn = await mysql.createConnection(dbConnect);
+                const messages = await dbQuery(conn,
+                    'SELECT * FROM `support-messages` WHERE room = ?',
+                    [roomRef.current]
+                );
 
-                this.emitToRoom('admin', 'update-users', UserDirector.getAllUsers());
+                if (messages) {
+                    socket.emit('past-messages', { messages });
+                }
 
-                this.io.emit('user-join', UserDirector.getAllUsers().length);
+                socket.join(roomRef.current);
 
-                socket.on('message', (data) => {
+                function generateRandomName() {
+                    const adjectives = ['cool', 'fast', 'quiet', 'bright', 'smart'];
+                    const nouns = ['tiger', 'falcon', 'gecko', 'panda', 'fox'];
+                    const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
+                    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+                    const randomNum = Math.floor(Math.random() * 1000);
+                    return `${randomAdj}-${randomNoun}-${randomNum}`;
+                }
 
-                    // so we receive a message
-                    // we know the role of this user from above
-                    // we can upload to db: the message, who sent it ('guest' or 'admin'), the room, timestamp
-                    // use mysql 2 for now (with XAMPP)
+                const userIdentifier = generateRandomName() + socket.id.split(4, 8);
 
-                    
+                UserDirector.addUser(userIdentifier, { room: roomRef.current, role: role });
 
-                    this.emitToRoom(room, 'message', { user: role, message: data });
+                const getAllUsers = UserDirector.getAllUsers();
+
+                this.emitToRoom('admin', 'update-users', getAllUsers);
+
+                this.io.emit('user-join', getAllUsers.length);
+
+                socket.on('message', async (data) => {
+
+                    const newTimestamp = formatTimestamp(decoded.exp);
+
+                    const uploadMessage = await dbQuery(conn,
+                        'INSERT INTO `support-messages` (room, user, message, `delete-after`) VALUES (?, ?, ?, ?)', 
+                        [roomRef.current, role, data, newTimestamp]
+                    );
+
+                    if (uploadMessage) {
+                        this.emitToRoom(roomRef.current, 'message', { user: role, message: data });
+                    }
+                    // else send error
                 });
 
-                socket.on('change-room', (newRoom) => {
+                socket.on('change-room', async (newRoom) => {
                     if (role !== 'admin') socket.disconnect();
-                    if (room !== 'admin') socket.leave(room);
-                    room = newRoom;
+                
+                    if (roomRef.current !== 'admin') {
+                        socket.leave(roomRef.current);
+                    }
+                
+                    const newMessages = await dbQuery(conn,
+                        'SELECT * FROM `support-messages` WHERE room = ?',
+                        [newRoom]
+                    );
+                
+                    if (newMessages) {
+                        socket.emit('past-messages', { messages: newMessages });
+                    }
+                
+                    roomRef.current = newRoom;
                     socket.join(newRoom);
                 });
 
                 socket.on('disconnect', () => {
-                    if (UserDirector.userExists(room)) {
-                        UserDirector.removeUserBySocketId(room);
+                    if (UserDirector.userExists(userIdentifier)) {
+                        UserDirector.removeUserBySocketId(userIdentifier);
                         this.io.emit('user-leave', UserDirector.getAllUsers().length);
                         this.io.emit('update-users', UserDirector.getAllUsers());
                     }
