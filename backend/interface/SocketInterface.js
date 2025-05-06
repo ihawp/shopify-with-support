@@ -5,6 +5,7 @@ const mysql = require('mysql2/promise');
 const dbConnect = require('../middleware/dbConnect.js');
 const nodeCron = require('node-cron');
 
+const generateRandomName = require('../middleware/generateRandomName.js');
 const formatTimestamp = require('../middleware/formatTimestamp.js');
 
 const dbQuery = async (conn, queryString, bindParam) => {
@@ -95,16 +96,7 @@ class SocketInterface {
 
                 socket.join(roomRef.current);
 
-                function generateRandomName() {
-                    const adjectives = ['cool', 'fast', 'quiet', 'bright', 'smart'];
-                    const nouns = ['tiger', 'falcon', 'gecko', 'panda', 'fox'];
-                    const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
-                    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-                    const randomNum = Math.floor(Math.random() * 1000);
-                    return `${randomAdj}-${randomNoun}-${randomNum}`;
-                }
-
-                const userIdentifier = generateRandomName() + socket.id.split(4, 8);
+                const userIdentifier = generateRandomName();
 
                 UserDirector.addUser(userIdentifier, { room: roomRef.current, role: role });
 

@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser');
 // Yet to implement
 const winston = require('winston');
 const nodemailer = require('nodemailer');
-const mysql2 = require('mysql2');
+const validator = require('validator');
 
 // Middleware
 const createCustomer = require('./middleware/createCustomer.js');
