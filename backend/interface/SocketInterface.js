@@ -48,10 +48,6 @@ class SocketInterface {
         this.io.on('connection', (socket) => {
 
             // ALL OF THIS NEEDS TO BE CLEANED UP
-<<<<<<< HEAD
-=======
-            // BUT THE LOGIC IS WORKING SMOOTHLY
->>>>>>> 266d87a5d29a91c830fecf76d6b6cd3d7138ec8d
 
             let verifier = 'user-secret-token';
 
