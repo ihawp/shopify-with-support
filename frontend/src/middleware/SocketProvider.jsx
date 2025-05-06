@@ -51,12 +51,14 @@ export default function SocketProvider({ children }) {
             withCredentials: true,
         });
 
-        socketRef.current.on('connect', () => {
-            console.log('connected');
-        });
+        socketRef.current.on('connect', () => { });
 
         socketRef.current.on('message', (rec) => {
             messageHandlerRef.current?.(rec);
+        });
+
+        socketRef.current.on('past-messages', (messages) => {
+            setMessages(messages.messages);
         });
 
         socketRef.current.on('auth-error', (message) => {

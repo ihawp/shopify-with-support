@@ -2,9 +2,7 @@ import { useContext, useState, useEffect } from 'react';
 import { SocketContext } from '../middleware/SocketProvider';
 
 export default function Support() {
-    const { sendMessage, messages, changeRoom, setNewUsers, newUsers } = useContext(SocketContext);
-
-    const [users, setUsers] = useState([]);
+    const { sendMessage, messages, changeRoom, newUsers } = useContext(SocketContext);
 
     const [room, setRoom] = useState(undefined);
 
