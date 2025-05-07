@@ -50,6 +50,7 @@ export default function Support() {
 
 
                     <ul className="messages">
+                        {true ? console.log(messages) : null}
                         {messages.map((msg, index) => (
                             <li key={index}>
                                 <strong>{msg.user}:</strong> {msg.message}

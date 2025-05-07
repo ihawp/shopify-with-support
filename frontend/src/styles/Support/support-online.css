@@ -5,6 +5,8 @@
 #support-online .dot {
     width: 8px;
     height: 8px;
+    border-radius: 8px;
+    margin: 0 8px 0 0;
 }
 
 #support-online .dot.green {
