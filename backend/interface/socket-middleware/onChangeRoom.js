@@ -2,7 +2,7 @@ module.exports = ({ socket, io, dbQuery, roomRef, role }) => {
     socket.on('change-room', async (newRoom) => {
         if (role !== 'admin') return socket.disconnect();
     
-        socket.leave(roomRef.current);
+        if (roomRef.current !== 'admin') socket.leave(roomRef.current);
         roomRef.current = newRoom;
         
         const newMessages = await dbQuery('SELECT * FROM `support-messages` WHERE room = ?', [newRoom]);
