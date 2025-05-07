@@ -13,7 +13,7 @@ export default function SocketProvider({ children }) {
     const [users, setUsers] = useState([]);
     const [newUsers, setNewUsers] = useState([]);
 
-    const [supportOnline, setSupportOnline] = useState(true);
+    const [supportOnline, setSupportOnline] = useState(false);
 
     messageHandlerRef.current = (rec) => {
         const { user, message } = rec;
@@ -60,15 +60,16 @@ export default function SocketProvider({ children }) {
         });
 
         socketRef.current.on('admin-online', (value) => {
-            setSupportOnline(value);
+            const { message } = value;
+            setSupportOnline(message);
         });
 
-        socketRef.current.on('past-messages', (messages) => {
-            setMessages(messages.messages);
+        socketRef.current.on('update-unread-counts', (rec) => {
+            console.log(rec);
         });
 
-        socketRef.current.on('auth-error', (message) => {
-            console.log(message);
+        socketRef.current.on('past-messages', ({ messages }) => {
+            setMessages(messages);
         });
 
         socketRef.current.on('user-join', (userCount) => {
@@ -83,6 +84,19 @@ export default function SocketProvider({ children }) {
             if (auth === 'is-admin') {
                 setNewUsers(data);
             }
+        });
+
+
+        // errors
+
+        socketRef.current.on('auth-error', (rec) => {
+            console.log(rec);
+        });
+
+        socketRef.current.on('error', (rec) => {
+            const { type, message } = rec;
+
+            console.log(type, message);
         });
 
         return () => socketRef.current.disconnect();
