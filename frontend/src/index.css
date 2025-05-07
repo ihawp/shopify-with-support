@@ -40,6 +40,13 @@ a {
 }
 
 /* ----------------------------------------------------------- */
+/* LIST */
+
+ul {
+  list-style: none;
+}
+
+/* ----------------------------------------------------------- */
 /* HEADER */
 
 body > header {
@@ -157,3 +164,49 @@ footer {
 .gap-3 {
   gap: 3rem;
 }
+
+/* ----------------------------------------------------------- */
+/* FONT */
+
+.fs-0-9 { font-size: 0.9rem; }
+.fs-1 { font-size: 1rem; }
+.fs-1-1 { font-size: 1.1rem; }
+.fs-1-2 { font-size: 1.2rem; }
+.fs-1-3 { font-size: 1.3rem; }
+.fs-1-4 { font-size: 1.4rem; }
+.fs-1-5 { font-size: 1.5rem; }
+.fs-1-6 { font-size: 1.6rem; }
+.fs-1-7 { font-size: 1.7rem; }
+.fs-1-8 { font-size: 1.8rem; }
+.fs-1-9 { font-size: 1.9rem; }
+.fs-2 { font-size: 2rem; }
+.fs-2-1 { font-size: 2.1rem; }
+.fs-2-2 { font-size: 2.2rem; }
+.fs-2-3 { font-size: 2.3rem; }
+.fs-2-4 { font-size: 2.4rem; }
+.fs-2-5 { font-size: 2.5rem; }
+.fs-2-6 { font-size: 2.6rem; }
+.fs-2-7 { font-size: 2.7rem; }
+.fs-2-8 { font-size: 2.8rem; }
+.fs-2-9 { font-size: 2.9rem; }
+.fs-3 { font-size: 3rem; }
+.fs-3-1 { font-size: 3.1rem; }
+.fs-3-2 { font-size: 3.2rem; }
+.fs-3-3 { font-size: 3.3rem; }
+.fs-3-4 { font-size: 3.4rem; }
+.fs-3-5 { font-size: 3.5rem; }
+.fs-3-6 { font-size: 3.6rem; }
+.fs-3-7 { font-size: 3.7rem; }
+.fs-3-8 { font-size: 3.8rem; }
+.fs-3-9 { font-size: 3.9rem; }
+.fs-4 { font-size: 4rem; }
+.fs-4-1 { font-size: 4.1rem; }
+.fs-4-2 { font-size: 4.2rem; }
+.fs-4-3 { font-size: 4.3rem; }
+.fs-4-4 { font-size: 4.4rem; }
+.fs-4-5 { font-size: 4.5rem; }
+.fs-4-6 { font-size: 4.6rem; }
+.fs-4-7 { font-size: 4.7rem; }
+.fs-4-8 { font-size: 4.8rem; }
+.fs-4-9 { font-size: 4.9rem; }
+.fs-5 { font-size: 5rem; }

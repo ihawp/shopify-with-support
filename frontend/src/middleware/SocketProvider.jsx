@@ -13,6 +13,8 @@ export default function SocketProvider({ children }) {
     const [users, setUsers] = useState([]);
     const [newUsers, setNewUsers] = useState([]);
 
+    const [supportOnline, setSupportOnline] = useState(true);
+
     messageHandlerRef.current = (rec) => {
         const { user, message } = rec;
         setMessages(prev => [...prev, { user, message }]);
@@ -57,6 +59,10 @@ export default function SocketProvider({ children }) {
             messageHandlerRef.current?.(rec);
         });
 
+        socketRef.current.on('admin-online', (value) => {
+            setSupportOnline(value);
+        });
+
         socketRef.current.on('past-messages', (messages) => {
             setMessages(messages.messages);
         });
@@ -91,7 +97,7 @@ export default function SocketProvider({ children }) {
     };
 
     return (
-        <SocketContext.Provider value={{ sendMessage, messages, changeRoom, users, auth, setNewUsers, newUsers }}>
+        <SocketContext.Provider value={{ sendMessage, messages, changeRoom, users, auth, setNewUsers, newUsers, supportOnline }}>
             {children}
         </SocketContext.Provider>
     );

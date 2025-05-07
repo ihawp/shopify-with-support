@@ -1,8 +1,13 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import { SocketContext } from '../middleware/SocketProvider';
 
+import '../styles/Support/support.css';
+import '../styles/Support/support-online.css';
+
 export default function Support() {
-    const { sendMessage, messages, changeRoom, newUsers } = useContext(SocketContext);
+    const { sendMessage, messages, changeRoom, newUsers, supportOnline } = useContext(SocketContext);
+
+    const bottomRef = useRef(null);
 
     const [room, setRoom] = useState(undefined);
 
@@ -13,63 +18,54 @@ export default function Support() {
         event.target.reset();
     };
 
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behaviour: 'smooth' });
+    }, [messages])
+
     const RoomChanger = (room) => {
         setRoom(room);
         changeRoom(room);
     }
 
-    return <main>
-            <header>
-                <h1>Support page</h1>
-            </header>
+    return <main id="support" className="flex flex-col items-center">
+            <div className="flex flex-row flex-wrap">
+                <header>
+                    <h1>Support Chat</h1>
+                    <div id="support-online" className="flex flex-row items-center">
+                        <span className={`dot ${supportOnline ? 'green' : 'red'}`}></span>
+                        <span>{supportOnline ? 'Support is online!' : 'Support is offline.'}</span>
+                    </div>
+                </header>
 
-            <section>
-                <form onSubmit={Submitter}>
-                    <input type="text" placeholder="Message" required />
-                    <input type="submit" value="Send" />
-                </form>
-            </section>
+                <section>
+                    {newUsers.length > 0 ? newUsers.map((item, key) => {
+                        return <div className={`flex flex-col user-selector ${room === item[1].room ? 'highlight' : null}`} onClick={() => RoomChanger(item[1].room)} key={key}>
+                            <span>{item[0]}</span>
+                            <span>{item[1].role}</span>
+                        </div>
+                    }) : null}
+                </section>
 
-            {newUsers.length > 0 ?
-            <section>
-                <h2>{room}</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>
-                                Socket
-                            </th>
-                            <th>
-                                Role
-                            </th>
-                            <th>
-                                Chat Now
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {newUsers.map((item, key) => {
-                            return <tr key={key}>
-                                <td>{item[0]}</td>
-                                <td>{item[1].role}</td>
-                                <td><button onClick={() => RoomChanger(item[1].room)}>Chat</button></td>
-                            </tr>
-                        })}
-                    </tbody>
-                </table>
-                <form>
+                <section>
 
-                </form>
-            </section> : null }
-            <section>
-                <h2>Messages:</h2>
-                <ul>
-                    {messages.map((msg, index) => (
-                        <li key={index}>
-                            <strong>{msg.user || 'Anonymous'}:</strong> {msg.message}
-                        </li>
-                    ))}
-                </ul>
-            </section>
+
+                    <ul className="messages">
+                        {messages.map((msg, index) => (
+                            <li key={index}>
+                                <strong>{msg.user}:</strong> {msg.message}
+                            </li>
+                        ))}
+                        <li ref={bottomRef} />
+                    </ul>
+
+                    <form onSubmit={Submitter}>
+                        <input type="text" placeholder="Message" required />
+                        <input type="submit" value="Send" />
+                    </form>
+
+
+                </section>
+
+            </div>
         </main>;
 }

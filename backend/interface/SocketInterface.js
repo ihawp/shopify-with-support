@@ -52,22 +52,17 @@ class SocketInterface {
 
             let verifier = 'user-secret-token';
 
-            // Here we parse the requests cookies
-            // And retrieve a token if one exists
             const cookies = cookie.parse(socket.request.headers.cookie || '');
             const token = cookies?.token;
 
-            // Force user to want to reload page so that they can retrieve auth and chat with support admin
             if (!token) {
                 socket.emit('auth-error', 'disconnecting because no auth');
                 socket.disconnect();
             }
 
-            // Use decode (allows access to key pair values stored in jwt without verifying the jwt with a secret token) to try admin checking (change verifier to admin-secret-token)
             const insecureDecoded = jwt.decode(token);
             if (insecureDecoded && insecureDecoded?.role === 'admin') verifier = 'admin-secret-token';
 
-            // Use jwt verify on the proper verifier (this could likely be reduced or functionality brought from elsewhere, but I think it's important it remains inline in this context without having to pass params)
             jwt.verify(token, verifier, async (err, decoded) => {
                 if (err) {
                     socket.emit('auth-error', 'Invalid or expired token.');
@@ -76,21 +71,15 @@ class SocketInterface {
                 }
 
                 const role = decoded.role || 'guest';
-                // this is an issue
-                // room needs to be const to remain defined within the 
-                const roomRef = {
-                    current: role === 'admin' ? 'admin' : decoded.room
-                };
+
+                const roomRef = { current: role === 'admin' ? 'admin' : decoded.room };
+
+                const newTimestamp = formatTimestamp(decoded.exp);
 
                 // Query for past messages and emit them to the user
-                const messages = await dbQuery(
-                    'SELECT * FROM `support-messages` WHERE room = ?',
-                    [roomRef.current]
-                );
+                const messages = await dbQuery('SELECT * FROM `support-messages` WHERE room = ?', [roomRef.current]);
 
-                if (messages) {
-                    socket.emit('past-messages', { messages });
-                }
+                if (messages) socket.emit('past-messages', { messages });
 
                 socket.join(roomRef.current);
 
@@ -102,13 +91,9 @@ class SocketInterface {
                 this.emitToRoom('admin', 'update-users', getAllUsers);
                 this.io.emit('user-join', getAllUsers.length);
 
-                if (role === 'admin') {
-                    this.emit('admin-online', true);
-                }
+                this.emit('admin-online', true);
 
                 socket.on('message', async (data) => {
-
-                    const newTimestamp = formatTimestamp(decoded.exp);
 
                     const uploadMessage = await dbQuery(
                         'INSERT INTO `support-messages` (room, user, message, `delete-after`) VALUES (?, ?, ?, ?)', 

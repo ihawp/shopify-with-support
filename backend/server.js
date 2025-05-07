@@ -8,7 +8,6 @@ const cookieParser = require('cookie-parser');
 // Yet to implement
 const winston = require('winston');
 const nodemailer = require('nodemailer');
-const validator = require('validator');
 
 // Middleware
 const createCustomer = require('./middleware/createCustomer.js');
@@ -16,7 +15,7 @@ const checkAdminToken = require('./middleware/checkAdminToken.js');
 const checkValidGuestToken = require('./middleware/checkValidGuestToken.js');
 const issueGuestToken = require('./middleware/issueGuestToken.js');
 const setHeader = require('./middleware/setHeader.js');
-const corsOptions = require('./middleware/corsOptions');
+const corsOptions = require('./middleware/corsOptions.js');
 const adminLogin = require('./middleware/adminLogin.js');
 const verifyJWT = require('./middleware/verifyJWT.js');
 
@@ -36,10 +35,6 @@ app.use(helmet());
 app.use(setHeader);
 app.use(express.json());
 app.use(cookieParser());
-
-// Routes
-
-// Should be able to know if support is online.
 
 app.post('/create-customer', createCustomer);
 
