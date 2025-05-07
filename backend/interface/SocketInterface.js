@@ -1,13 +1,11 @@
 const { Server } = require('socket.io');
-const jwt = require('jsonwebtoken');
-const cookie = require('cookie');
 const mysql = require('mysql2/promise');
 const dbConnect = require('../middleware/dbConnect.js');
 const nodeCron = require('node-cron');
 
 const corsOptions = require('../middleware/corsOptions.js');
-
 const socketHandlers = require('./socket-middleware/index.js');
+const socketAuth = require('./socket-middleware/socketAuth.js');
 
 const conn = mysql.createPool(dbConnect);
 
@@ -33,13 +31,9 @@ class SocketInterface {
     constructor(httpServer, UserDirector) {
         this.io = new Server(httpServer, { cors: corsOptions, });
 
-        this.io.use(require('./socket-middleware/socketAuth.js'));
+        this.io.use(socketAuth);
 
         this.io.on('connection', (socket) => {
-
-            const getAllUsers = UserDirector.getAllUsers();
-            this.emitToRoom('admin', 'update-users', getAllUsers);
-            this.io.emit('user-join', getAllUsers.length);
 
             socketHandlers({ socket, io: this.io, dbQuery, UserDirector });
 

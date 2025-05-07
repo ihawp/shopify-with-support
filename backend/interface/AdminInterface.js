@@ -1,0 +1,5 @@
+class AdminInterface {
+    constructor() {
+        
+    }
+}

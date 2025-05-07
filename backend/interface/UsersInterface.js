@@ -22,6 +22,7 @@ class UsersInterface {
   }
 
   adminOnline() {
+    // could be more efficient, perhaps admin object containing all admin instances
     return Array.from(this.users.values()).some(arr => arr.role === 'admin');
   }
 

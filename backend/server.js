@@ -44,7 +44,7 @@ app.get('/getUsers', verifyJWT, (req, res) => {
 });
 
 app.get('/getUsersCount', (req, res) => {
-  let usersWithRooms = UserDirector.getAllUsers().length || 1;
+  let usersWithRooms = UserDirector.getAllUsers().length;
   res.json({ count: usersWithRooms }); 
 });
 

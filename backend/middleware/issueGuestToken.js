@@ -1,8 +1,12 @@
 const jwt = require('jsonwebtoken');
+const generateRandomName = require('./generateRandomName.js');
 
 const issueGuestToken = (req, res) => {
+
+  const randomName = generateRandomName();
+
   const newToken = jwt.sign(
-    { room: `${Date.now()}_guest`, role: 'guest' },
+    { role: 'guest', name: randomName, room: `${Date.now()}_guest`},
     'user-secret-token',
     { expiresIn: '1h' }
   );
