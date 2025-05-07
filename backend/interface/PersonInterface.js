@@ -12,6 +12,14 @@ class PersonInterface {
         this.people.delete(socketId);
     }
 
+    updateRoom(socketId, newRoom) {
+        if (!this.people.has(socketId)) return false;
+    
+        const user = this.people.get(socketId);
+        this.people.set(socketId, { ...user, room: newRoom });
+        return true;
+    }
+
     getUserData(socketId) {
         return this.people.get(socketId);
     }

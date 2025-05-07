@@ -1,10 +1,15 @@
-module.exports = ({ socket, io, dbQuery, roomRef, role }) => {
+module.exports = ({ socket, io, dbQuery, roomRef, role, name, AdminDirector }) => {
     socket.on('change-room', async (newRoom) => {
         if (role !== 'admin') return socket.disconnect();
     
         if (roomRef.current !== 'admin') socket.leave(roomRef.current);
         roomRef.current = newRoom;
-        
+
+        if (role === 'admin') {
+            AdminDirector.updateRoom(name, roomRef.current);
+            console.log(AdminDirector.getAllUsers());
+        }
+
         const newMessages = await dbQuery('SELECT * FROM `support-messages` WHERE room = ?', [newRoom]);
 
         if (!newMessages) return socket.emit('error', { type: 'db-error', message: 'Failed to retrieve messages from the database.' });

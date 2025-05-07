@@ -1,6 +1,7 @@
 const validator = require('validator');
+const AdminInterface = require('../AdminInterface');
 
-module.exports = ({ socket, io, dbQuery, roomRef, role, timestamp }) => {
+module.exports = ({ socket, io, dbQuery, roomRef, role, timestamp, AdminDirector }) => {
     socket.on('message', async (message) => {
 
         if (typeof message !== 'string') return socket.emit('error', { type: 'format-error', message: 'Message not in proper format.' });
@@ -14,7 +15,9 @@ module.exports = ({ socket, io, dbQuery, roomRef, role, timestamp }) => {
             [roomRef.current, role, trimMessage, timestamp]
         );
 
-        if (role !== 'admin') io.to('admin').emit('update-unread-counts', { room: roomRef.current, unread: 1 } );
+        if (role !== 'admin' && !AdminDirector.adminInRoom(roomRef.current)) {
+            io.to('admin').emit('update-unread-counts', { room: roomRef.current, unread: 1 } );
+        }
 
         if (!insert) return socket.emit('error', { type: 'db-error', message: 'There was an issue uploading your message to the database.' } )
 

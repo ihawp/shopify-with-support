@@ -7,47 +7,67 @@ const rateLimitAllEvents = require('../../middleware/rateLimitAllEvents.js');
 
 module.exports = async ({ socket, io, dbQuery, UserDirector, AdminDirector }) => {
     const { role, room, exp, name } = socket.user;
-    const roomRef = { current: role === 'admin' ? 'admin' : room };
     const timestamp = formatTimestamp(exp);
+    const roomRef = { current: role === 'admin' ? 'admin' : room };
 
     socket.join(roomRef.current);
 
-    switch (role) {
-        case 'guest':
-            const [unreadMessages] = await dbQuery('SELECT room, COUNT(*) AS unread FROM `support-messages` WHERE `is_read` = 0 AND `room` = ? AND user != "admin"', [roomRef.current]);        
-            if (!unreadMessages) return socket.emit('error', { type: 'db-error', message: 'Error retrieving unread messages from database.' });
-            const { unread } = unreadMessages;
-            UserDirector.addUser(name, { room: roomRef.current, role, unread });
-            break;
-        case 'admin':
-            AdminDirector.addUser(name, { room: roomRef.current, role });
-            break;
+    if (role === 'guest') {
+        const [unreadData] = await dbQuery(`
+            SELECT room, COUNT(*) AS unread 
+            FROM \`support-messages\` 
+            WHERE \`is_read\` = 0 AND \`room\` = ? AND user != "admin"
+        `, [roomRef.current]);
+
+        if (!unreadData) {
+            return socket.emit('error', { type: 'db-error', message: 'Error retrieving unread messages.' });
+        }
+
+        const { unread } = unreadData;
+        UserDirector.addUser(name, { room: roomRef.current, role, unread });
     }
-
-    const getAllUsers = UserDirector.getAllUsers();
-    io.to('admin').emit('update-users', getAllUsers);
-    io.emit('user-join', getAllUsers.length);
-
-    const adminOnline = AdminDirector.adminOnline();
-    io.emit('admin-online', { message: adminOnline });
 
     if (role === 'admin') {
-        const unreadMessages = await dbQuery('SELECT room, COUNT(*) AS unread FROM `support-messages` WHERE `is_read` = 0 AND user != "admin" GROUP BY `room`');        
-        if (!unreadMessages) return socket.emit('error', { type: 'db-error', message: 'Error retrieving unread messages from database.' });
-    
-        const usersWithUnread = UserDirector.getAllUsers().map(([socketId, user]) => {
-            const match = unreadMessages.find(msg => msg.room === user.room || console.log(user.room));
+        AdminDirector.addUser(name, { room: roomRef.current, role });
+
+        const unreadMessages = await dbQuery(`
+            SELECT room, COUNT(*) AS unread 
+            FROM \`support-messages\` 
+            WHERE \`is_read\` = 0 AND user != "admin" 
+            GROUP BY room
+        `);
+
+        if (!unreadMessages) {
+            return socket.emit('error', { type: 'db-error', message: 'Error retrieving unread messages.' });
+        }
+
+        const updatedUsers = UserDirector.getAllUsers().map(([socketId, user]) => {
+            const match = unreadMessages.find(msg => msg.room === user.room);
             return [socketId, { ...user, unread: match?.unread || 0 }];
         });
-    
-        io.to('admin').emit('update-users', usersWithUnread);
+
+        io.to('admin').emit('update-users', updatedUsers);
     }
 
-    const results = await dbQuery('SELECT * FROM `support-messages` WHERE room = ?', [roomRef.current]);
-    if (results) socket.emit('past-messages', { messages: results });
+    // Emit updated user list to all clients
+    const allUsers = UserDirector.getAllUsers();
+    io.to('admin').emit('update-users', allUsers);
+    io.emit('user-join', allUsers.length);
 
-    if (role !== 'admin') rateLimitAllEvents(socket);
+    // Emit admin online status
+    io.emit('admin-online', { message: AdminDirector.adminOnline() });
+
+    // Send past messages to the newly joined user
+    const pastMessages = await dbQuery('SELECT * FROM `support-messages` WHERE room = ?', [roomRef.current]);
+    if (pastMessages) {
+        socket.emit('past-messages', { messages: pastMessages });
+    }
+
+    if (role !== 'admin') {
+        rateLimitAllEvents(socket);
+    }
+
     onDisconnect({ socket, io, UserDirector, AdminDirector, role, name });
-    onMessage({ socket, io, dbQuery, roomRef, role, timestamp });
-    onChangeRoom({ socket, io, dbQuery, roomRef, role });
+    onMessage({ socket, io, dbQuery, roomRef, role, timestamp, AdminDirector });
+    onChangeRoom({ socket, io, dbQuery, roomRef, role, AdminDirector, name });
 };
