@@ -99,10 +99,9 @@ class SocketInterface {
 
                 UserDirector.addUser(userIdentifier, { room: roomRef.current, role: role });
 
+                // Emit users values and length (for admin and live user count)
                 const getAllUsers = UserDirector.getAllUsers();
-
                 this.emitToRoom('admin', 'update-users', getAllUsers);
-
                 this.io.emit('user-join', getAllUsers.length);
 
                 socket.on('message', async (data) => {

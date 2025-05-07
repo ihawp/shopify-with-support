@@ -38,11 +38,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-app.get('/user-login', checkAdminToken, checkValidGuestToken, issueGuestToken);
 
-app.post('/login', adminLogin);
-
-// Admin protected routes
 app.post('/create-customer', createCustomer);
 
 app.get('/getUsers', verifyJWT, (req, res) => {
@@ -50,10 +46,13 @@ app.get('/getUsers', verifyJWT, (req, res) => {
   res.json(usersWithRooms); 
 });
 
-// Open routes
 app.get('/getUsersCount', (req, res) => {
   let usersWithRooms = UserDirector.getAllUsers().length || 1;
   res.json({ count: usersWithRooms }); 
 });
+
+app.post('/login', adminLogin);
+
+app.get('/user-login', checkAdminToken, checkValidGuestToken, issueGuestToken);
 
 server.listen(3000);

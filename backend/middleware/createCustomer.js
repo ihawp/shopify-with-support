@@ -1,5 +1,5 @@
-const isValidEmailFormat = require("./isValidEmailFormat");
 const { SHOPIFY_ADMIN_API_URL, ADMIN_API_TOKEN } = require('../keys.js');
+const validator = require('validator');
 
 const mutation = `
     mutation customerCreate($input: CustomerInput!) {
@@ -25,12 +25,7 @@ const mutation = `
 const createCustomer = async (req, res) => {
   const { email } = req.body;
 
-  console.log(email);
-
-  // sanitize
-  
-  // Check regex
-  let isValidEmail = isValidEmailFormat(email);
+  let isValidEmail = validator.isEmail(email);
   
   if (!isValidEmail) return res.status(400).json({ userErrors: 'Not An Email.' });
   
@@ -58,19 +53,15 @@ const createCustomer = async (req, res) => {
       const data = await response.json();
   
       const { customerCreate } = data.data;
-  
-      // email prints as null ?? it is still uploaded to customers table.
-      console.log(customerCreate);
-  
+
       if (customerCreate?.userErrors.length > 0) {
         return res.status(400).json({ userErrors: customerCreate.userErrors });
       }
   
       return res.status(200).json({ success: true, customer: customerCreate.customer });
-    } catch (err) {
-      console.error('Admin API request failed:', err);
+  } catch (err) {
       return res.status(500).json({ error: 'Internal server error' });
-    }
+  }
 }
 
 module.exports = createCustomer
