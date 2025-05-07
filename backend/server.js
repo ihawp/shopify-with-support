@@ -21,14 +21,16 @@ const verifyJWT = require('./middleware/verifyJWT.js');
 
 // Interface
 const UsersInterface = require('./interface/UsersInterface.js');
+const AdminInterface = require('./interface/AdminInterface.js');
 const SocketInterface = require('./interface/SocketInterface.js');
 
 const UserDirector = new UsersInterface();
+const AdminDirector = new AdminInterface();
 
 const app = express();
 const server = http.createServer(app);
 
-new SocketInterface(server, UserDirector);
+new SocketInterface(server, UserDirector, AdminDirector);
 
 app.use(cors(corsOptions));
 app.use(helmet());

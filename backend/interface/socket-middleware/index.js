@@ -5,20 +5,27 @@ const onDisconnect = require('./onDisconnect');
 const formatTimestamp = require('../../middleware/formatTimestamp.js');
 const rateLimitAllEvents = require('../../middleware/rateLimitAllEvents.js');
 
-module.exports = async ({ socket, io, dbQuery, UserDirector }) => {
+module.exports = async ({ socket, io, dbQuery, UserDirector, AdminDirector }) => {
     const { role, room, exp, name } = socket.user;
     const roomRef = { current: role === 'admin' ? 'admin' : room };
     const timestamp = formatTimestamp(exp);
 
     socket.join(roomRef.current);
 
-    UserDirector.addUser(name, { room: roomRef.current, role });
+    switch (role) {
+        case 'guest':
+            UserDirector.addUser(name, { room: roomRef.current, role });
+            break;
+        case 'admin':
+            AdminDirector.addUser(name, { room: roomRef.current, role });
+            break;
+    }
 
     const getAllUsers = UserDirector.getAllUsers();
     io.to('admin').emit('update-users', getAllUsers);
     io.emit('user-join', getAllUsers.length);
 
-    const adminOnline = UserDirector.adminOnline();
+    const adminOnline = AdminDirector.adminOnline();
     io.emit('admin-online', { message: adminOnline });
 
     if (role === 'admin') {
@@ -31,7 +38,7 @@ module.exports = async ({ socket, io, dbQuery, UserDirector }) => {
     if (results) socket.emit('past-messages', { messages: results });
 
     if (role !== 'admin') rateLimitAllEvents(socket);
-    onDisconnect({ socket, io, UserDirector, role, name });
+    onDisconnect({ socket, io, UserDirector, AdminDirector, role, name });
     onMessage({ socket, io, dbQuery, roomRef, role, timestamp });
     onChangeRoom({ socket, io, dbQuery, roomRef, role });
 };

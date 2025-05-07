@@ -1,42 +1,9 @@
-class UsersInterface {
-  constructor() {
-    this.users = new Map();
-  }
+const PersonInterface = require('./PersonInterface');
 
-  addUser(socketId, { room, role }) {
-    const userData = { room, role };
-    this.users.set(socketId, userData);
-  }
-
-  removeUserBySocketId(socketId) {
-    this.users.delete(socketId);
-  }
-
-  updateUser(socketId, { room, role }) {
-    if (this.users.has(socketId)) {
-      const updatedData = { room, role };
-      this.users.set(socketId, updatedData);
-    } else {
-      return 0;
+class UserInterface extends PersonInterface {
+    constructor() {
+        super();
     }
-  }
-
-  adminOnline() {
-    // could be more efficient, perhaps admin object containing all admin instances
-    return Array.from(this.users.values()).some(arr => arr.role === 'admin');
-  }
-
-  getUserData(socketId) {
-    return this.users.get(socketId);
-  }
-
-  userExists(socketId) {
-    return this.users.has(socketId);
-  }
-
-  getAllUsers() {
-    return Array.from(this.users.entries());
-  }
 }
 
-module.exports = UsersInterface;
+module.exports = UserInterface;

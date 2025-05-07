@@ -28,14 +28,14 @@ async function clearExpiredMessages() {
 }
 
 class SocketInterface {
-    constructor(httpServer, UserDirector) {
+    constructor(httpServer, UserDirector, AdminDirector) {
         this.io = new Server(httpServer, { cors: corsOptions, });
 
         this.io.use(socketAuth);
 
         this.io.on('connection', (socket) => {
 
-            socketHandlers({ socket, io: this.io, dbQuery, UserDirector });
+            socketHandlers({ socket, io: this.io, dbQuery, UserDirector, AdminDirector });
 
         });
 
