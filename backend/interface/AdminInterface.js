@@ -6,6 +6,8 @@ class AdminInterface extends PersonInterface {
     }
 
     adminOnline() {
+        console.log(this.people);
+        console.log(this.people.size);
         return this.people.size > 0;
     }
 
