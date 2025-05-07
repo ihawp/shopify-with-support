@@ -14,7 +14,11 @@ module.exports = async ({ socket, io, dbQuery, UserDirector, AdminDirector }) =>
 
     switch (role) {
         case 'guest':
-            UserDirector.addUser(name, { room: roomRef.current, role });
+            const [unreadMessages] = await dbQuery('SELECT room, COUNT(*) AS unread FROM `support-messages` WHERE `is_read` = 0 AND `room` = ? AND user != "admin"', [roomRef.current]);        
+            if (!unreadMessages) return socket.emit('error', { type: 'db-error', message: 'Error retrieving unread messages from database.' });
+            console.log(unreadMessages);
+            const { unread } = unreadMessages;
+            UserDirector.addUser(name, { room: roomRef.current, role, unread });
             break;
         case 'admin':
             AdminDirector.addUser(name, { room: roomRef.current, role });
@@ -29,9 +33,15 @@ module.exports = async ({ socket, io, dbQuery, UserDirector, AdminDirector }) =>
     io.emit('admin-online', { message: adminOnline });
 
     if (role === 'admin') {
-        const unreadMessages = await dbQuery('SELECT * FROM `support-messages` WHERE `delete-after` < NOW() AND `is_read` = 0');
-        if (!unreadMessages) return socket.emit('error', { type: 'db-error', message: 'Error retrieving unread messages from database.' })
-        io.to('admin').emit('update-unread-counts', unreadMessages);
+        const unreadMessages = await dbQuery('SELECT room, COUNT(*) AS unread FROM `support-messages` WHERE `is_read` = 0 AND user != "admin" GROUP BY `room`');        
+        if (!unreadMessages) return socket.emit('error', { type: 'db-error', message: 'Error retrieving unread messages from database.' });
+    
+        const usersWithUnread = UserDirector.getAllUsers().map(([socketId, user]) => {
+            const match = unreadMessages.find(msg => msg.room === user.room || console.log(user.room));
+            return [socketId, { ...user, unread: match?.unread || 0 }];
+        });
+    
+        socket.emit('update-users', usersWithUnread);
     }
 
     const results = await dbQuery('SELECT * FROM `support-messages` WHERE room = ?', [roomRef.current]);

@@ -9,10 +9,8 @@ export default function SocketProvider({ children }) {
 
     const [messages, setMessages] = useState([]);
     const [auth, setAuth] = useState(null);
-
     const [users, setUsers] = useState([]);
     const [newUsers, setNewUsers] = useState([]);
-
     const [supportOnline, setSupportOnline] = useState(false);
 
     messageHandlerRef.current = (rec) => {
@@ -34,9 +32,7 @@ export default function SocketProvider({ children }) {
                 if (!response.ok) throw new Error('Auth failed');
 
                 const data = await response.json();
-
                 const result = data?.message === 'is-admin' ? 'is-admin' : true;
-
                 setAuth(result);
             } catch {
                 setAuth(false);
@@ -53,7 +49,7 @@ export default function SocketProvider({ children }) {
             withCredentials: true,
         });
 
-        socketRef.current.on('connect', () => { });
+        socketRef.current.on('connect', () => {});
 
         socketRef.current.on('message', (rec) => {
             messageHandlerRef.current?.(rec);
@@ -64,10 +60,28 @@ export default function SocketProvider({ children }) {
             setSupportOnline(message);
         });
 
-        socketRef.current.on('update-unread-counts', (rec) => {
-            console.log(rec);
+        socketRef.current.on('initial-unread-counts', (rec) => {
+            setNewUsers(prev =>
+                prev.map(([socketId, user]) => {
+                    const count = rec.find(msg => msg.room === user.room)?.unread || 0;
+                    return [socketId, { ...user, unread_count: count }];
+                })
+            );
         });
-
+        
+        socketRef.current.on('update-unread-counts', ({ room, unread }) => {
+            setNewUsers(prev =>
+                prev.map(([socketId, user]) => [
+                    socketId,
+                    {...user,
+                        unread: user.room === room
+                        ? (unread ? (user.unread || 0) + unread : 0)
+                        : user.unread || 0
+                    }
+                ])
+            );
+        });
+        
         socketRef.current.on('past-messages', ({ messages }) => {
             setMessages(messages);
         });
@@ -86,16 +100,12 @@ export default function SocketProvider({ children }) {
             }
         });
 
-
-        // errors
-
         socketRef.current.on('auth-error', (rec) => {
             console.log(rec);
         });
 
         socketRef.current.on('error', (rec) => {
             const { type, message } = rec;
-
             console.log(type, message);
         });
 
@@ -111,7 +121,18 @@ export default function SocketProvider({ children }) {
     };
 
     return (
-        <SocketContext.Provider value={{ sendMessage, messages, changeRoom, users, auth, setNewUsers, newUsers, supportOnline }}>
+        <SocketContext.Provider
+            value={{
+                sendMessage,
+                messages,
+                changeRoom,
+                users,
+                auth,
+                setNewUsers,
+                newUsers,
+                supportOnline
+            }}
+        >
             {children}
         </SocketContext.Provider>
     );

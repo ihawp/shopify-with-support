@@ -2,18 +2,6 @@
 
 }
 
-.user-selector {
-    max-width: 200px;
-    height: 43px;
-    background-color: white;
-    color: black;
-    cursor: pointer;
-}
-
-.user-selector.highlight {
-    background-color: gray;
-}
-
 #support div header {
     width: 100%;
 }

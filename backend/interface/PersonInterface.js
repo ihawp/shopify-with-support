@@ -3,8 +3,8 @@ class PersonInterface {
         this.people = new Map();
     }
 
-    addUser(socketId, { room, role }) {
-        const personData = { room, role };
+    addUser(socketId, { room, role, unread }) {
+        const personData = { room, role, unread };
         this.people.set(socketId, personData);
     }
 

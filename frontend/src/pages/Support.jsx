@@ -3,6 +3,7 @@ import { SocketContext } from '../middleware/SocketProvider';
 
 import '../styles/Support/support.css';
 import '../styles/Support/support-online.css';
+import '../styles/Support/user-selector.css';
 
 export default function Support() {
     const { sendMessage, messages, changeRoom, newUsers, supportOnline } = useContext(SocketContext);
@@ -29,19 +30,20 @@ export default function Support() {
 
     return <main id="support" className="flex flex-col items-center">
             <div className="flex flex-row flex-wrap">
-                <header>
+                <header id="support-online">
                     <h1>Support Chat</h1>
-                    <div id="support-online" className="flex flex-row items-center">
+                    <div className="flex flex-row items-center">
                         <span className={`dot ${supportOnline ? 'green' : 'red'}`}></span>
                         <span>{supportOnline ? 'Support is online!' : 'Support is offline.'}</span>
                     </div>
                 </header>
 
-                <section>
+                <section id="user-selector">
                     {newUsers.length > 0 ? newUsers.map((item, key) => {
                         return <div className={`flex flex-col user-selector ${room === item[1].room ? 'highlight' : null}`} onClick={() => RoomChanger(item[1].room)} key={key}>
-                            <span>{item[0]}</span>
-                            <span>{item[1].role}</span>
+                            <p>{item[0]}</p>
+                            <p>{item[1].role}</p>
+                            <p>{item[1].unread}</p>
                         </div>
                     }) : null}
                 </section>

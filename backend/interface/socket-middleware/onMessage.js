@@ -14,7 +14,7 @@ module.exports = ({ socket, io, dbQuery, roomRef, role, timestamp }) => {
             [roomRef.current, role, trimMessage, timestamp]
         );
 
-        io.to('admin').emit('update-unread-counts', { room: roomRef.current, unread: 1 } );
+        if (role !== 'admin') io.to('admin').emit('update-unread-counts', { room: roomRef.current, unread: 1 } );
 
         if (!insert) return socket.emit('error', { type: 'db-error', message: 'There was an issue uploading your message to the database.' } )
 
