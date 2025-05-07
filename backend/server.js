@@ -39,6 +39,8 @@ app.use(cookieParser());
 
 // Routes
 
+// Should be able to know if support is online.
+
 app.post('/create-customer', createCustomer);
 
 app.get('/getUsers', verifyJWT, (req, res) => {

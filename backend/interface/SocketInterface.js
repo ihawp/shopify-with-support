@@ -76,7 +76,6 @@ class SocketInterface {
                 }
 
                 const role = decoded.role || 'guest';
-
                 // this is an issue
                 // room needs to be const to remain defined within the 
                 const roomRef = {
@@ -99,10 +98,13 @@ class SocketInterface {
 
                 UserDirector.addUser(userIdentifier, { room: roomRef.current, role: role });
 
-                // Emit users values and length (for admin and live user count)
                 const getAllUsers = UserDirector.getAllUsers();
                 this.emitToRoom('admin', 'update-users', getAllUsers);
                 this.io.emit('user-join', getAllUsers.length);
+
+                if (role === 'admin') {
+                    this.emit('admin-online', true);
+                }
 
                 socket.on('message', async (data) => {
 
@@ -144,6 +146,10 @@ class SocketInterface {
                         UserDirector.removeUserBySocketId(userIdentifier);
                         this.io.emit('user-leave', UserDirector.getAllUsers().length);
                         this.io.emit('update-users', UserDirector.getAllUsers());
+                    }
+
+                    if (role === 'admin') {
+                        this.emit('admin-online', UserDirector.adminOnline());
                     }
                 });
             });

@@ -21,6 +21,10 @@ class UsersInterface {
     }
   }
 
+  adminOnline() {
+    return Array.from(this.users.values()).some(arr => arr.role === 'admin');
+  }
+
   getUserData(socketId) {
     return this.users.get(socketId);
   }

@@ -5,6 +5,8 @@ const checkAdminToken = (req, res, next) => {
 
   if (!token) return next();
 
+  console.log(token);
+
   jwt.verify(token, 'admin-secret-token', (err, decoded) => {
     if (err) {
       return next();
