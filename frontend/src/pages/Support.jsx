@@ -21,7 +21,7 @@ export default function Support() {
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behaviour: 'smooth' });
-    }, [messages])
+    }, [messages]);
 
     const RoomChanger = (room) => {
         setRoom(room);

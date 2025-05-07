@@ -16,7 +16,6 @@ module.exports = async ({ socket, io, dbQuery, UserDirector, AdminDirector }) =>
         case 'guest':
             const [unreadMessages] = await dbQuery('SELECT room, COUNT(*) AS unread FROM `support-messages` WHERE `is_read` = 0 AND `room` = ? AND user != "admin"', [roomRef.current]);        
             if (!unreadMessages) return socket.emit('error', { type: 'db-error', message: 'Error retrieving unread messages from database.' });
-            console.log(unreadMessages);
             const { unread } = unreadMessages;
             UserDirector.addUser(name, { room: roomRef.current, role, unread });
             break;
@@ -41,7 +40,7 @@ module.exports = async ({ socket, io, dbQuery, UserDirector, AdminDirector }) =>
             return [socketId, { ...user, unread: match?.unread || 0 }];
         });
     
-        socket.emit('update-users', usersWithUnread);
+        io.to('admin').emit('update-users', usersWithUnread);
     }
 
     const results = await dbQuery('SELECT * FROM `support-messages` WHERE room = ?', [roomRef.current]);
