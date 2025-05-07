@@ -8,7 +8,9 @@ const nodeCron = require('node-cron');
 const generateRandomName = require('../middleware/generateRandomName.js');
 const formatTimestamp = require('../middleware/formatTimestamp.js');
 
-const dbQuery = async (conn, queryString, bindParam) => {
+const conn = mysql.createPool(dbConnect);
+
+const dbQuery = async (queryString, bindParam) => {
     try {
         const [results] = await conn.execute(
             queryString,
@@ -22,12 +24,10 @@ const dbQuery = async (conn, queryString, bindParam) => {
 
 async function clearExpiredMessages() {
     try {
-        const conn = await mysql.createConnection(dbConnect);
         const [results] = await conn.execute(
             'DELETE FROM `support-messages` WHERE `delete-after` < NOW() AND `user` != "admin"'
         );
         console.log(`Deleted ${results.affectedRows} expired messages.`);
-        await conn.end();
     } catch (error) {
         console.error('Error clearing expired messages:', error);
     }
@@ -84,8 +84,7 @@ class SocketInterface {
                 };
 
                 // Query for past messages and emit them to the user
-                const conn = await mysql.createConnection(dbConnect);
-                const messages = await dbQuery(conn,
+                const messages = await dbQuery(
                     'SELECT * FROM `support-messages` WHERE room = ?',
                     [roomRef.current]
                 );
@@ -110,7 +109,7 @@ class SocketInterface {
 
                     const newTimestamp = formatTimestamp(decoded.exp);
 
-                    const uploadMessage = await dbQuery(conn,
+                    const uploadMessage = await dbQuery(
                         'INSERT INTO `support-messages` (room, user, message, `delete-after`) VALUES (?, ?, ?, ?)', 
                         [roomRef.current, role, data, newTimestamp]
                     );
@@ -128,7 +127,7 @@ class SocketInterface {
                         socket.leave(roomRef.current);
                     }
                 
-                    const newMessages = await dbQuery(conn,
+                    const newMessages = await dbQuery(
                         'SELECT * FROM `support-messages` WHERE room = ?',
                         [newRoom]
                     );
