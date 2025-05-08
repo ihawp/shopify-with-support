@@ -1,6 +1,6 @@
 /* MOBILE FIRST CSS - IHAWP.COM */
 
-html { scroll-behaviour: smooth; box-sizing: border-box; }
+html { scroll-behaviour: smooth; box-sizing: border-box; font-family: sans-serif; }
 *, *:before, *:after { box-sizing: inherit; margin: 0; padding: 0; }
 
 body {
@@ -30,7 +30,10 @@ h6 {}
 /* ----------------------------------------------------------- */
 /* PARAGRAPH */
 
-p {}
+p {
+  font-size: 18px;
+  line-height: 24px;
+}
 
 /* ----------------------------------------------------------- */
 /* ANCHOR */
@@ -61,11 +64,10 @@ main > header {
 /* MAIN */
 
 main {
-
+  background-color: blue;
 }
 
 section {
-
 }
 
 /* ----------------------------------------------------------- */

@@ -38,7 +38,7 @@ export default function Support() {
                     </div>
                 </header>
 
-                <section id="user-selector">
+                <div id="user-selector">
                     {newUsers.length > 0 ? newUsers.map((item, key) => {
                         return <div className={`flex flex-col user-selector ${room === item[1].room ? 'highlight' : null}`} onClick={() => RoomChanger(item[1].room)} key={key}>
                             <p>{item[0]}</p>
@@ -46,7 +46,7 @@ export default function Support() {
                             <p>{item[1].unread}</p>
                         </div>
                     }) : null}
-                </section>
+                </div>
 
                 <section>
 

@@ -8,6 +8,12 @@
 
 ul.messages {
     height: 400px;
-    width: 500px;
+    width: 100vw;
     overflow-y: scroll;
+}
+
+@media (min-width: 50em) {
+    ul.messages {
+        width: 50rem;
+    }
 }
