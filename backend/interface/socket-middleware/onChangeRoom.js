@@ -7,7 +7,6 @@ module.exports = ({ socket, io, dbQuery, roomRef, role, name, AdminDirector }) =
 
         if (role === 'admin') {
             AdminDirector.updateRoom(name, roomRef.current);
-            console.log(AdminDirector.getAllUsers());
         }
 
         const newMessages = await dbQuery('SELECT * FROM `support-messages` WHERE room = ?', [newRoom]);

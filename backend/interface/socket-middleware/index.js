@@ -1,6 +1,7 @@
 const onMessage = require('./onMessage');
 const onChangeRoom = require('./onChangeRoom');
 const onDisconnect = require('./onDisconnect');
+const { isTyping, stopTyping } = require('./onTyping.js');
 
 const formatTimestamp = require('../../middleware/formatTimestamp.js');
 const rateLimitAllEvents = require('../../middleware/rateLimitAllEvents.js');
@@ -22,11 +23,28 @@ module.exports = async ({ socket, io, dbQuery, UserDirector, AdminDirector }) =>
         UserDirector.addUser(name, { room: roomRef.current, role, unread: unreadData[0].unread });
     }
 
-    // Get all users current message room/counts and send to all admins (via admin room)
-    // Emit updated user list to all clients
+    // Send signal 
+    // (before a potentially futher updated admin signal)
+    // This signal is used to tell the frontend that the user has joined and that the message channel is available for joining
     const allUsers = UserDirector.getAllUsers();
     io.to('admin').emit('update-users', allUsers);
     io.emit('user-join', allUsers.length);
+
+    // Get all users current message room/counts and send to all admins (via admin room)
+    if (role === 'admin') {
+        AdminDirector.addUser(name, { room: roomRef.current, role });
+
+        const unreadMessages = await dbQuery(`SELECT room, COUNT(*) AS unread FROM \`support-messages\` WHERE \`is_read\` = 0 AND user != "admin" GROUP BY room`);
+
+        if (!unreadMessages) return socket.emit('error', { type: 'db-error', message: 'Error retrieving unread messages.' });
+
+        const updatedUsers = UserDirector.getAllUsers().map(([userName, user]) => {
+            const match = unreadMessages.find(msg => msg.room === user.room);
+            return [userName, { ...user, unread: match?.unread || 0 }];
+        });
+
+        io.to('admin').emit('update-users', updatedUsers);
+    }
 
     // Emit admin online status
     io.emit('admin-online', { message: AdminDirector.adminOnline() });
@@ -38,6 +56,8 @@ module.exports = async ({ socket, io, dbQuery, UserDirector, AdminDirector }) =>
     // Socket IO Events
     if (role !== 'admin') rateLimitAllEvents(socket);
     onDisconnect({ socket, io, UserDirector, AdminDirector, role, name });
-    onMessage({ socket, io, dbQuery, roomRef, role, timestamp, AdminDirector });
+    onMessage({ socket, io, dbQuery, roomRef, role, timestamp, AdminDirector, name, UserDirector });
     onChangeRoom({ socket, io, dbQuery, roomRef, role, AdminDirector, name });
+    isTyping({ socket, io, roomRef });
+    stopTyping({ socket, io, roomRef });
 };

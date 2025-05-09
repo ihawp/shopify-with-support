@@ -6,24 +6,51 @@ import '../styles/Support/support-online.css';
 import '../styles/Support/user-selector.css';
 
 export default function Support() {
-    const { sendMessage, messages, changeRoom, newUsers, supportOnline } = useContext(SocketContext);
+    const { sendMessage, messages, changeRoom, newUsers, supportOnline, isTyping, stopTyping, userTyping } = useContext(SocketContext);
 
     const bottomRef = useRef(null);
+    const messageRef = useRef(null);
 
+    const [alreadyTyping, setAlreadyTyping] = useState(false);
     const [room, setRoom] = useState(undefined);
 
     const Submitter = (event) => {
         event.preventDefault();
-        const message = event.target[0].value;
-        sendMessage(message);
+        sendMessage(messageRef.current.value);
+        resetMessageInput();
+        sendTyping(false);
+        setAlreadyTyping(false);
         event.target.reset();
     };
+
+    const resetMessageInput = () => {
+        messageRef.current.value = '';
+    }
+
+    const sendTyping = (bool) => {
+        if (bool) return isTyping();
+        stopTyping();
+    }
+
+    const doTyping = (event) => {
+        // limit sending of signals because rate limiting
+        if (event.target.value.length > 0 && !alreadyTyping) {
+            setAlreadyTyping(true);
+            return isTyping();
+        }
+        if (event.target.value.length === 0) {
+            setAlreadyTyping(false);
+            stopTyping();
+        }
+    }
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behaviour: 'smooth' });
     }, [messages]);
 
     const RoomChanger = (room) => {
+        resetMessageInput();
+        sendTyping(false);
         setRoom(room);
         changeRoom(room);
     }
@@ -60,8 +87,12 @@ export default function Support() {
                         <li ref={bottomRef} />
                     </ul>
 
+                    <div>
+                        {userTyping ? 'user is typing' : null}
+                    </div>
+
                     <form onSubmit={Submitter}>
-                        <input type="text" placeholder="Message" required />
+                        <input ref={messageRef} type="text" placeholder="Message" onChange={doTyping} required />
                         <input type="submit" value="Send" />
                     </form>
 
