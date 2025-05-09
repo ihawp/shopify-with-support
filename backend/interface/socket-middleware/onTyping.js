@@ -1,12 +1,16 @@
-const isTyping = ({ socket, io, roomRef }) => {
+const isTyping = ({ socket, io, roomRef, name }) => {
     socket.on('is-typing', () => {
-        if (roomRef.current !== 'admin') io.to(roomRef.current).emit('typing', { val: true });
+        if (roomRef.current !== 'admin') {
+            socket.to(roomRef.current).emit('typing', { name, val: true })
+        };
     });
 }
 
-const stopTyping = ({ socket, io, roomRef }) => {
+const stopTyping = ({ socket, io, roomRef, name }) => {
     socket.on('stop-typing', () => {
-        if (roomRef.current !== 'admin') io.to(roomRef.current).emit('typing', { val: false });
+        if (roomRef.current !== 'admin') {
+            socket.to(roomRef.current).emit('typing', { name, val: false })
+        };
     });
 }
 

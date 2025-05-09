@@ -96,9 +96,7 @@ export default function SocketProvider({ children }) {
         });
 
         socketRef.current.on('update-users', (data) => {
-            if (auth === 'is-admin') {
-                setNewUsers(data);
-            }
+            if (auth === 'is-admin') setNewUsers(data);
         });
 
         socketRef.current.on('typing', (rec) => {

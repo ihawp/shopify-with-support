@@ -20,7 +20,7 @@ module.exports = ({ socket, io, dbQuery, roomRef, role, name, AdminDirector }) =
         if (!updateMessage) return socket.emit('error', { type: 'db-error', message: 'Failed to update messages as read (is_read).' })
 
         io.to('admin').emit('update-unread-counts', { room: newRoom, unread: 0 });
-    
+
         socket.join(newRoom);
     });
 };

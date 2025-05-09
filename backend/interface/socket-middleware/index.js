@@ -20,7 +20,7 @@ module.exports = async ({ socket, io, dbQuery, UserDirector, AdminDirector }) =>
 
         if (!unreadData) return socket.emit('error', { type: 'db-error', message: 'Error retrieving unread messages.' });
 
-        UserDirector.addUser(name, { room: roomRef.current, role, unread: unreadData[0].unread });
+        UserDirector.addUser(name, { room: roomRef.current, role, unread: unreadData[0].unread, typing: false });
     }
 
     // Send signal 
@@ -58,6 +58,6 @@ module.exports = async ({ socket, io, dbQuery, UserDirector, AdminDirector }) =>
     onDisconnect({ socket, io, UserDirector, AdminDirector, role, name });
     onMessage({ socket, io, dbQuery, roomRef, role, timestamp, AdminDirector, name, UserDirector });
     onChangeRoom({ socket, io, dbQuery, roomRef, role, AdminDirector, name });
-    isTyping({ socket, io, roomRef });
-    stopTyping({ socket, io, roomRef });
+    isTyping({ socket, io, roomRef, name });
+    stopTyping({ socket, io, roomRef, name });
 };
