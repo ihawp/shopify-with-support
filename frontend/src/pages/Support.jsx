@@ -88,7 +88,9 @@ export default function Support() {
                     </ul>
 
                     <div>
-                        {userTyping ? 'user is typing' : null}
+                        {userTyping.map((item, key) => {
+                             return item.val ? <p key={key}>{item.name} is typing.</p> : null;
+                        })}
                     </div>
 
                     <form onSubmit={Submitter}>

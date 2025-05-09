@@ -12,7 +12,7 @@ export default function SocketProvider({ children }) {
     const [users, setUsers] = useState([]);
     const [newUsers, setNewUsers] = useState([]);
     const [supportOnline, setSupportOnline] = useState(false);
-    const [userTyping, setUserTyping] = useState(false);
+    const [userTyping, setUserTyping] = useState([]);
 
     messageHandlerRef.current = (rec) => {
         const { user, message } = rec;
@@ -100,8 +100,18 @@ export default function SocketProvider({ children }) {
         });
 
         socketRef.current.on('typing', (rec) => {
-            setUserTyping(rec.val);
+            setUserTyping(prev => {
+                const exists = prev.some(user => user.name === rec.name);
+                if (exists) {
+                    return prev.map(user =>
+                        user.name === rec.name ? rec : user
+                    );
+                } else {
+                    return [...prev, rec];
+                }
+            });
         });
+        
 
         socketRef.current.on('auth-error', (rec) => {
             console.log(rec);
@@ -127,11 +137,11 @@ export default function SocketProvider({ children }) {
         // potential issue with this approach is that it may not work upon load if user is already typing, but I will test now and see!
 
         // sent values do not really matter because sending the signal is the signal
-        socketRef.current?.emit('is-typing', { isTyping: true });
+        socketRef.current?.emit('is-typing');
     }
 
     const stopTyping = () => {
-        socketRef.current?.emit('stop-typing', { stopTyping: true });
+        socketRef.current?.emit('stop-typing');
     }
 
     const sendMessage = (message) => {
