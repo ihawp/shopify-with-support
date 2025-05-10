@@ -30,7 +30,11 @@ body {
 /* ----------------------------------------------------------- */
 /* HEADERS */
 
-h1, label { visibility: hidden; width: 0; height: 0; }
+label { display: none; visibility: hidden; width: 0; height: 0; }
+
+h1 {
+  line-height: 5rem;
+}
 
 h2 { font-size: 2rem; line-height: 3rem; }
 
@@ -44,10 +48,16 @@ h4 { font-size: 1.25rem; line-height: 2rem; }
 p {}
 
 /* ----------------------------------------------------------- */
-/* ANCHOR */
+/* ANCHOR / <NavLink /> */
 
 a {
   color: #fff;
+  text-decoration: none;
+}
+
+a.active {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* ----------------------------------------------------------- */
@@ -58,14 +68,32 @@ ul {
 }
 
 /* ----------------------------------------------------------- */
+/* SVG */
+
+svg {
+  width: 35px;
+  height: 35px;
+  fill: #fff;
+}
+
+/* ----------------------------------------------------------- */
+/* BUTTON */
+
+button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+/* ----------------------------------------------------------- */
 /* HEADER */
 
 body > header {
 
 }
 
-main > header {
-
+main > header, main > section {
+  width: 100%;
 }
 
 /* ----------------------------------------------------------- */
@@ -88,11 +116,26 @@ footer {
 /* MEDIA */
 
 @media (min-width: 50em) {
+
+  body {
+    margin: 1rem;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  main > header, main > section {
+    width: 50rem;
+  }
   
 }
 
-@media (min-width: 75em) {
-
+@media (min-width: 65em) {
+  main > header, main > section {
+    width: 65rem;
+  }
 }
 
 /* ----------------------------------------------------------- */
@@ -154,6 +197,10 @@ footer {
 /* ----------------------------------------------------------- */
 /* GAP */
 
+.gap-0-5 {
+  gap: .5rem;
+}
+
 .gap-1 {
   gap: 1rem;
 }
@@ -184,4 +231,124 @@ footer {
 
 .w-100 {
   width: 100%;
+}
+
+.w-50-sm-unset {
+  width: 50%;
+}
+
+.w-1-rem {
+  width: 1rem;
+}
+
+.w-4-rem {
+  width: 4rem;
+}
+
+.w-unset {
+  width: unset;
+}
+
+.w-1 {
+  width: 100px;
+}
+
+.w-2 {
+  width: 200px;
+}
+
+.max-w-2 {
+  max-width: 200px;
+}
+
+.max-w-3 {
+  max-width: 300px;
+}
+
+/* ----------------------------------------------------------- */
+/* PADDING */
+
+.p-0-75 {
+  padding: .75rem;
+}
+
+.p-1 {
+  padding: 1rem;
+}
+
+@media (min-width: 50em) {
+  .w-50-sm-unset {
+    width: unset;
+  }
+}
+
+/* form */
+
+form {
+  position: relative;
+}
+
+form input, form button {
+  border-radius: 100px;
+  background-color: transparent;
+  border: 1px solid #555;
+  color: #fff;
+  font-size: .95rem;
+}
+
+form input:focus {
+  border-color: #fff;
+}
+
+form input::placeholder {
+  color: #555;
+}
+
+#message-form input[type="text"], #message-form input[type="email"], #message-form input[type="password"] {
+  padding: 1rem 8rem 1rem 2rem;
+}
+
+form input[type="text"], form input[type="email"], form input[type="password"] {
+  outline: none;
+  width: 100%;
+}
+
+form button {
+  width: 7rem;
+  position: absolute;
+  right: .25rem;
+  top: .25rem;
+  cursor: pointer;
+  background-color: #333;
+
+  border: 1px solid #555;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+form button svg {
+  width: 1rem;
+  height: 1rem;
+  fill: #555;
+  transition: 0.25s ease;
+}
+
+form button:focus svg, form button:hover svg {
+  transform: translate(0, -50px);
+}
+
+form .send-text {
+  opacity: 0;
+  position: absolute;
+  top: 150px;
+  color: #777;
+  transition: 0.25s ease;
+}
+
+form button:focus .send-text, form button:hover .send-text {
+  opacity: 1;
+  top: .75rem;
 }

@@ -76,9 +76,9 @@ export default function Cart() {
         addItemToCart(product);
     }
 
-    return <main>
+    return <main className='flex flex-col items-center'>
         <header>
-            <h1>Cart Page</h1>
+            <h1>Cart</h1>
         </header>
         <section>
             <p>Print cart contents here.</p>

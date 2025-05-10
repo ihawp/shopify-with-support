@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 
 // Pages
-import Home from './pages/Home';
+import Shop from './pages/Shop';
 import Support from './pages/Support';
 import Cart from './pages/Cart';
 import Product from './pages/Product';
@@ -30,7 +30,7 @@ export default function App() {
       <Header />
 
       <Routes>
-        <Route path='/' element={ <Home /> } />
+        <Route path='/' element={ <Shop /> } />
 
         <Route path='/support' element={ <Support /> } />
         <Route path='/cart' element={ <Cart /> } />

@@ -1,7 +1,7 @@
 export default function Privacy() {
-    return <main>
+    return <main className='flex flex-col items-center'>
         <header>
-            <h1>Privacy page</h1>
+            <h1>Privacy</h1>
         </header>
         <section>
         </section>

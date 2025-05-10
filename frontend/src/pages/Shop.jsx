@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import { client } from '../middleware/ShopifyProvider.jsx';
 
 import Product from '../components/Product.jsx';
-import EmailEntry from '../components/EmailEntry.jsx';
 
-export default function Home() {
+export default function Shop() {
   const [products, setProducts] = useState([]);
   const [endCursor, setEndCursor] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(true);
@@ -15,7 +14,7 @@ export default function Home() {
 
     const query = `
       {
-        products(first: 2${cursor ? `, after: "${cursor}"` : ''}) {
+        products(first: 3${cursor ? `, after: "${cursor}"` : ''}) {
           pageInfo {
             hasNextPage
             endCursor
@@ -69,9 +68,9 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  return <main>
+  return <main className='flex flex-col items-center'>
       <header>
-        <h1>Home Page</h1>
+        <h1>Shop</h1>
       </header>
 
       <section>
@@ -87,6 +86,5 @@ export default function Home() {
         </button>
       )}
 
-      <EmailEntry />
     </main>;
 }

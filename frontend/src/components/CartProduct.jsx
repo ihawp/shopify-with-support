@@ -13,7 +13,7 @@ export default function CartProduct({ item, cart }) {
     }
 
     const ViewProduct = () => {
-        navigate(`/view/${item.handle}`);
+        navigate(`/product/${item.handle}`);
     }
 
     return <div onClick={ViewProduct}>

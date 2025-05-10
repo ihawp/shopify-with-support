@@ -1,12 +1,7 @@
-#support {
-}
-
 #support > div {
     border-radius: 8px;
     width: 100%;
-
     border: 1px solid gray;
-
     background-color: #222;
 }
 

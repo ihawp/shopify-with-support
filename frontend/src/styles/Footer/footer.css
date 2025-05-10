@@ -1,0 +1,34 @@
+footer {
+    height: max-content;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+footer .bottom {
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.email-list {
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+#email-form input[type="text"], #email-form input[type="email"], #email-form input[type="password"] {
+    padding: 1rem 5.5rem 1rem 1.5rem;
+}
+
+#email-form button[type="submit"] {
+    width: 4rem;
+    padding: .75rem;
+}
+
+@media (min-width: 50em) {
+    footer .bottom {
+        flex-direction: row;
+    }
+}

@@ -34,6 +34,8 @@ const createCustomer = async (req, res) => {
   
   if (!isValidEmail) return res.status(400).json({ userErrors: 'Not An Email.' });
   
+  // Getting consent update at must not be in the future error
+  // Will look into it!
   const variables = {
       input: {
         email: email,
@@ -56,10 +58,11 @@ const createCustomer = async (req, res) => {
       });
 
       const data = await response.json();
-  
+
       const { customerCreate } = data.data;
 
       if (customerCreate?.userErrors.length > 0) {
+        console.log(customerCreate, data);
         return res.status(400).json({ userErrors: customerCreate.userErrors });
       }
   

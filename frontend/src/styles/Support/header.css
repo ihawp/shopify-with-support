@@ -27,11 +27,11 @@ header#support-online {
 }
 
 #support-online .dot.green {
-    background-color: green;
+    background-color: limegreen;
 }
 
 #support-online .dot.red {
-    background-color: red;
+    background-color: rgb(255, 58, 58);
 }
 
 #support-online .header-is-admin {

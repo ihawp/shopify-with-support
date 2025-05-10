@@ -12,7 +12,7 @@ export default function Product({ node }) {
     const ViewProduct = (event) => {
         // use handle as link for individual page
         let handle = node.handle;
-        navigate(`/view/${handle}`);
+        navigate(`/product/${handle}`);
     }
 
     const AddToCart = (event) => {
