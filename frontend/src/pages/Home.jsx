@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { client } from '../middleware/ShopifyProvider.jsx';
 
 import Product from '../components/Product.jsx';
-
 import EmailEntry from '../components/EmailEntry.jsx';
 
 export default function Home() {

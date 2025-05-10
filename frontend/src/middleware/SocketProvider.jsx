@@ -100,19 +100,24 @@ export default function SocketProvider({ children }) {
         });
 
         socketRef.current.on('typing', (rec) => {
-            setUserTyping(prev => {
-                const exists = prev.some(user => user.name === rec.name);
-                if (exists) {
-                    return prev.map(user =>
-                        user.name === rec.name ? rec : user
-                    );
-                } else {
-                    return [...prev, rec];
-                }
-            });
+            if (rec.val) {
+                setUserTyping(prev => {
+                    const exists = prev.some(user => user.name === rec.name);
+                    if (exists) {
+                        return prev.map(user =>
+                            user.name === rec.name ? rec : user
+                        );
+                    } else {
+                        return [...prev, rec];
+                    }
+                });
+            } else {
+                setUserTyping(prev =>
+                    prev.filter(user => user.name !== rec.name)
+                );
+            }
         });
         
-
         socketRef.current.on('auth-error', (rec) => {
             console.log(rec);
         });
@@ -126,17 +131,11 @@ export default function SocketProvider({ children }) {
     }, [auth]);
 
     const changeRoom = (room) => {
+        setUserTyping([]);
         socketRef.current?.emit('change-room', room);
     };
 
     const isTyping = () => {
-        // basically while the input box has contents it will be typing
-        // and if the length is 0 then we stopTyping and it will send signal to remove from frontend DOM
-        // room will be referencable from backend upon socket doing thing
-
-        // potential issue with this approach is that it may not work upon load if user is already typing, but I will test now and see!
-
-        // sent values do not really matter because sending the signal is the signal
         socketRef.current?.emit('is-typing');
     }
 

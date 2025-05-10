@@ -1,0 +1,56 @@
+header#support-online {
+    font-size: .9rem;
+    width: 1050px;
+    border-bottom: 1px solid #333;
+}
+
+/* ----------------------------------------------------------- */
+/* ADMIN/SUPPORT ONLINE INDICATOR */
+
+#support-online > div {
+
+}
+
+#support-online .bubble {
+    width: max-content;
+    margin: 8px 8px;
+    border-radius: 100px;
+    padding: 0 1rem;
+    background-color: #333;
+}
+
+#support-online .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 8px;
+    margin: 0 8px 0 0;
+}
+
+#support-online .dot.green {
+    background-color: green;
+}
+
+#support-online .dot.red {
+    background-color: red;
+}
+
+#support-online .header-is-admin {
+    width: calc(100% - 178px);
+}
+
+#support-online .header-is-admin > div:nth-child(1) {
+    width: 250px;
+    padding: 0 .5rem;
+    font-weight: 700;
+}
+
+#support-online .header-is-admin > div:nth-child(2) {
+    width: calc(100% - 250px);
+}
+
+#support-online .header-is-admin > div svg {
+    width: 1rem;
+    height: 1rem;
+    fill: #fff;
+    margin-right: 8px;
+}

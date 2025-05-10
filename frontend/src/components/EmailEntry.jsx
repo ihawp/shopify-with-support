@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { client } from '../middleware/ShopifyProvider';
 import ServerURL from '../middleware/ServerURL';
 
 export default function EmailEntry() {

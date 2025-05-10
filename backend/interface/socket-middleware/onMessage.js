@@ -15,11 +15,21 @@ module.exports = ({ socket, io, dbQuery, roomRef, role, timestamp, AdminDirector
             [roomRef.current, role, trimMessage, timestamp]
         );
 
+        if (!insert) return socket.emit('error', { type: 'db-error', message: 'There was an issue uploading your message to the database.' } );
+
         if (role !== 'admin' && !AdminDirector.adminInRoom(roomRef.current)) {
             io.to('admin').emit('update-unread-counts', { room: roomRef.current, unread: 1 } );
         }
 
-        if (!insert) return socket.emit('error', { type: 'db-error', message: 'There was an issue uploading your message to the database.' } )
+        if (AdminDirector.adminInRoom(roomRef.current)) {
+            const insertedId = insert?.insertId;
+            const updateRead = await dbQuery(
+                'UPDATE `support-messages` SET `is_read` = 1 WHERE id = ?',
+                [insertedId]
+            );
+        
+            if (!updateRead) return socket.emit('error', { type: 'db-error', message: 'There was an issue updating the read status of the message.' });
+        }
 
         io.to(roomRef.current).emit('message', { user: role, message });
     });

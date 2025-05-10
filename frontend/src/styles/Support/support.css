@@ -1,19 +1,23 @@
 #support {
-
 }
 
-#support div header {
+#support > div {
+    border-radius: 8px;
     width: 100%;
-}
 
-ul.messages {
-    height: 400px;
-    width: 100vw;
-    overflow-y: scroll;
+    border: 1px solid gray;
+
+    background-color: #222;
 }
 
 @media (min-width: 50em) {
-    ul.messages {
+    #support > div {
         width: 50rem;
+    }
+}
+
+@media (min-width: 65em) {
+    #support > div {
+        width: 65rem;
     }
 }

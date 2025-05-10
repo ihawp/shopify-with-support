@@ -1,0 +1,173 @@
+section#support-chat {
+    width: 100%;
+}
+
+/* ----------------------------------------------------------- */
+/* USER SELECTOR (LEFT ADMIN TAB) */
+
+#user-selector {
+    min-width: 250px;
+    max-height: 514px;
+    overflow: hidden;
+    overflow-y: scroll;
+}
+
+.user-selector {
+    min-width: 250px;
+    height: max-content;
+    cursor: pointer;
+    padding: .5rem;
+    border-radius: 4px;
+    color: #666;
+    transition: all 0.05s ease;
+}
+
+.user-selector:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+.user-selector:hover > div span:nth-child(2) {
+    color: #666;
+}
+
+.user-selector.highlight {
+    background-color: #333;
+    color: #fff;
+}
+
+.user-selector > div {
+    width: 70%;
+}
+
+.user-selector > div span:nth-child(2) {
+    color: #555;
+    line-height: 1.1rem;
+}
+
+.user-selector.highlight > div span:nth-child(2) {
+    color: #888;
+}
+
+.user-selector > span {
+    border: 1px solid gray;
+    border-radius: 4px;
+
+    width: 43px;
+    height: 43px;
+
+    text-align: center;
+}
+
+/* ----------------------------------------------------------- */
+/* MESSAGES */
+
+section#support-chat ul.messages {
+    height: 400px;
+    overflow: hidden;
+    overflow-y: scroll;
+    padding: 0 1.25rem;
+}
+
+#chat {
+    width: calc(100%);
+}
+
+
+ul.messages li {
+    font-size: 1rem;
+    margin-bottom: 3px;
+}
+ul.messages li:last-of-type {
+    margin-bottom: 10px;
+}
+ul.messages li .username {
+    margin-top: 10px;
+    margin-bottom: 4px;
+    font-weight: 700;
+}
+
+ul.messages li:not(:first-child) .username {
+    border-top: 1px solid #333;
+    padding-top: 10px;
+}
+
+.is-typing {
+    height: 1.5rem;
+    font-size: .69rem;
+    padding: 0 2rem;
+    color: #555;
+}
+
+/* ----------------------------------------------------------- */
+/* FORM */
+
+#message-form {
+    position: relative;
+    margin: 0 1rem 1rem 0;
+}
+
+#message-form input, #message-form button {
+    padding: .75rem;
+    border-radius: 100px;
+    background-color: transparent;
+    border: 1px solid #555;
+    color: #fff;
+    font-size: .95rem;
+}
+
+#message-form input:focus {
+    border-color: #fff;
+}
+
+#message-form input::placeholder {
+    color: #555;
+}
+
+#message-form input[type="text"] {
+    padding: 1rem 8rem 1rem 2rem;
+    outline: none;
+    width: 100%;
+}
+
+#message-form button {
+    width: 7rem;
+    position: absolute;
+    right: .25rem;
+    top: .25rem;
+    cursor: pointer;
+    background-color: #333;
+
+    border: 1px solid #555;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+#message-form button svg {
+    width: 1rem;
+    height: 1rem;
+    fill: #555;
+    margin-right: 4px;
+    transition: 0.25s ease;
+}
+
+#message-form button:focus svg, #message-form button:hover svg {
+    transform: translate(0, -50px);
+}
+
+#message-form .send-text {
+    opacity: 0;
+    position: absolute;
+    top: 150px;
+    color: #777;
+
+    transition: 0.25s ease;
+}
+
+#message-form button:focus .send-text, #message-form button:hover .send-text {
+    opacity: 1;
+    top: .75rem;
+}

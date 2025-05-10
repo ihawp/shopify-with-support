@@ -20,7 +20,7 @@ const dbQuery = async (queryString, bindParam) => {
 
 async function clearExpiredMessages() {
     try {
-        await conn.execute('DELETE FROM `support-messages` WHERE `delete-after` < NOW() AND `user` != "admin"');
+        await conn.execute('DELETE FROM `support-messages` WHERE `delete-after` < NOW()');
     } catch (error) {
         console.error('Error clearing expired messages:', error);
     }
