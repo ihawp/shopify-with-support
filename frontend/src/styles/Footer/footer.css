@@ -44,10 +44,12 @@ footer .bottom {
 #email-form button[type="submit"] {
     width: 4rem;
     padding: .75rem;
+    top: .25rem;
+    right: .25rem;
 }
 
 .email-list h2 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     background: linear-gradient(90deg, #555 40%, #777);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -73,6 +75,7 @@ footer nav ul {
         border: 1px solid #666;
         padding: 3rem 4rem 0 4rem;
         max-width: unset;
+        width: 500px;
         gap: 1.5rem;
         max-height: 200px;
     }

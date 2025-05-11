@@ -1,6 +1,7 @@
 .cart-product .product {
     width: unset;
-    flex-direction: row;
+    height: min-content;
+    flex-direction: column;
 }
 
 .cart-product {
@@ -83,8 +84,12 @@
 }
 
 .product .content-container {
-    margin-top: 10px;
+    margin-top: 15px;
     height: 160px;
+}
+
+.cart-product .product .content-container {
+    height: min-content;
 }
 
 .product .button-container {
@@ -97,6 +102,14 @@
 }
 
 @media (min-width: 40em) {
+
+    .cart-product .product .content-container {
+        margin-top: 0;
+    }
+
+    .cart-product .product {
+        flex-direction: row;
+    }
 
     .shop-products .product {
         width: calc(50% - 8px);

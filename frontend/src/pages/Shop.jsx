@@ -77,12 +77,12 @@ export default function Shop() {
   };
 
   useEffect(() => {
-    if (products.length === 0) fetchProducts();
+    fetchProducts();
   }, []);
 
   return <main className='flex flex-col items-center gap-1'>
 
-      <Hero leftIdentity='shop-hero' backgroundClass={'background-1'} title='store.ihawp.com' subtitle='We are here to help.' description='Want to learn Front-End Web Development?' hashLinks={[{to: '#user-count', title: "Shop Now"}]} links={[{to: '/support', title: "Get Support Now"}]}/>
+      <Hero leftIdentity='shop-hero' backgroundClass={'background-1'} title='store.ihawp.com' subtitle="We&apos;re here to help." description='Want to learn Front-End Web Development?' hashLinks={[{to: '#user-count', title: "Shop Now"}]} links={[{to: '/support', title: "Need Help?"}]}/>
 
       <section className='flex flex-row gap-1 justify-between'>
         <div title={`Shoppers Online: ${users}`} className='bubble py-1 px-0-5 flex items-center flex-row gap-1' id="user-count">

@@ -39,7 +39,7 @@ body {
 
 label { display: none; visibility: hidden; width: 0; height: 0; }
 
-h1 { font-size: 2rem; line-height: 5rem; }
+h1 { font-size: 2rem; line-height: 3rem; }
 
 h2 { font-size: 2rem; line-height: 3rem; }
 
@@ -353,6 +353,16 @@ footer {
 .px-0-5 {
   padding-top: .5rem;
   padding-bottom: .5rem;
+}
+
+.px-1 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.px-2 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 
 /* ----------------------------------------------------------- */

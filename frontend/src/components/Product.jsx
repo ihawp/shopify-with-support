@@ -13,10 +13,8 @@ export default function Product({ node }) {
 
     const ViewProduct = (event) => {
         // use handle as link for individual page
-        let handle = node.handle;
-        navigate(`/product/${handle}`, {
-            state: { gid: node.id }
-        });
+        console.log(node.id);
+        navigate(`/product/${node.id.split('/')[4]}`);
     }
 
     const AddToCart = (event) => {
@@ -41,7 +39,7 @@ export default function Product({ node }) {
         <div className="flex flex-col items-start w-100">
             <div className="content-container">
                 <h2>{node.title}</h2>
-                <p>{node?.description ? node.description.slice(0, 100).trim() + '...' : 'No Description Available.'}</p>
+                <p>{node?.description ? node.description.slice(0, 200).trim() + '...' : 'No Description Available.'}</p>
             </div>
             <div className='button-container'>
                 <p aria-label="Price">{`$${node?.variants?.edges[0]?.node?.price?.amount}0 ${node?.variants?.edges[0]?.node?.price?.currencyCode}`}</p>

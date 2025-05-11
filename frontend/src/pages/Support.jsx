@@ -73,7 +73,7 @@ export default function Support() {
 
     return <main id="support" className="flex flex-col items-center">
             <Hero leftIdentity='support-hero' backgroundClass={'background-2'} title='Support' subtitle='Need some help?' description='We are here to help you we care a lot so please let us know if you need anything.' hashLinks={[{to: '#support-online', title: "Get Support Now"}]} links={[{to: '/', title: "Shop"}]} />
-            <div className="flex flex-row flex-wrap">
+            <div className="flex flex-row flex-wrap mt-1">
                 <header id="support-online" className="flex flex-row">
                     {auth === 'is-admin' ? <div className="header-is-admin flex flex-row items-center">
                         {newUsers.length > 0 ? <div className="flex flex-row items-center">

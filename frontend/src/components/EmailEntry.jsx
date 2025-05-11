@@ -49,7 +49,7 @@ export default function EmailEntry() {
   return (
     <div className='flex justify-center w-100'>
       <div className='flex-col email-list'>
-        <h2>Join Our Email List!</h2>
+        <h2>Join Our Mailing List!</h2>
           <form onSubmit={emailSubmit} className="max-w-3" id="email-form">
           <label htmlFor="email-input">Input Your Email:</label>
           {message ? null : 

@@ -61,11 +61,10 @@ export default function Header() {
                     </button>
                 </NavLink>
             </nav>
-            <NavLink to={'/'} id="logo" className="display-sm">
-                <Logo />
-            </NavLink>
-            <div className="none-sm w-100">
-                <SearchBar />
+            <div className='logo header'>
+                <NavLink to={'/'} className="display-sm">
+                    <Logo />
+                </NavLink>
             </div>
         </header>;
 }

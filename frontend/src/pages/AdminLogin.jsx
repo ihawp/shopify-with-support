@@ -2,6 +2,8 @@ import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ServerURL from '../middleware/ServerURL';
 
+import '../styles/Login/login.css';
+
 export default function AdminLogin() {
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
@@ -61,15 +63,17 @@ export default function AdminLogin() {
     };
 
     return (
-        <main>
-            <header>
-                <h1>Admin Login</h1>
+        <main id="login" className='flex flex-col items-center gap-1 mt-1'>
+            <header className='text-center'>
+                <h1>Login</h1>
             </header>
             <section>
-                <form onSubmit={formSubmit}>
-                    <input type="text" placeholder="Username" required />
-                    <input type="password" placeholder="Password" required />
-                    <input type="submit" value="Login" />
+                <form onSubmit={formSubmit} className='flex flex-col items-center gap-0-5'>
+                    <label for="username">Enter Your Username:</label>
+                    <input className="py-1 px-0-5" id="username" type="text" placeholder="Username" required />
+                    <label for="password">Enter Your Password:</label>
+                    <input className="py-1 px-0-5" id="password" type="password" placeholder="Password" required />
+                    <input className="py-1 px-0-5" type="submit" value="Login" />
                 </form>
                 {loading && <p>Loading...</p>}
                 {error && <p style={{ color: 'red' }}>{error}</p>}

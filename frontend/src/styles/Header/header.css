@@ -94,9 +94,26 @@
         width: 250px;
     }
 
-    #logo {
+    .logo {
         width: 250px;
+    }
+
+    .logo.header {
         order: 3;
+    }
+
+    .logo a {
+        width: min-content;
+    }
+
+    .logo.header svg {
+        width: 35px;
+        height: 35px;
+    }
+
+    .logo.footer svg {
+        width: 20px;
+        height: 20px;
     }
 
     #anchor-list {

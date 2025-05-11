@@ -1,0 +1,12 @@
+#login {
+
+}
+
+#login input[type="text"], #login input[type="password"] {
+    width: 300px;
+}
+
+#login input[type="submit"] {
+    cursor: pointer;
+}
+

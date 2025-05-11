@@ -24,7 +24,6 @@ export default function Cart() {
     // This allows for product to stay in cart if removed (for readding)
     // Product is removed upon reload as it would not be included in localStorage
     // after the initial removal... unless it was readded to cart..!
-    const [cartOnPrint, setCartOnPrint] = useState(cartItems);
     const [cartPrice, setCartPrice] = useState(0);
 
     async function createCheckout(cartItems) {
@@ -92,15 +91,15 @@ export default function Cart() {
     }, [cartItems]);
 
     return <main className='flex flex-col items-center'>
-        {cartOnPrint.length > 0 ? <header>
-            <h1>Cart</h1>
+        {cartItems.length > 0 ? <header className='px-2'>
+            <h1>Your Cart:</h1>
         </header> : null}
         <section>
             <div className='cart-product flex flex-col gap-2'>
-                {cartOnPrint.length > 0 ? cartOnPrint.map((item, key) => {
+                {cartItems.length > 0 ? cartItems.map((item, key) => {
                     // pipe drilling
                     return <Product key={key} node={item} cart={{ AddToCart, RemoveFromCart, isItemInCart }} />
-                }) : <Hero leftIdentity={'support-hero cart-hero'} backgroundClass={'background-1'} title='Cart' subtitle='Your Cart is empty!' description='Add items, or receive support by clicking the buttons below.' links={[{to: '/support', title: 'Get Support'}, {to: '/', title: 'Shop Now'}]} />}
+                }) : <Hero leftIdentity={'support-hero cart-hero'} backgroundClass={'background-3'} title='Cart' subtitle='Your Cart is empty!' description='Add items, or receive support by clicking the buttons below.' links={[{to: '/support', title: 'Get Support'}, {to: '/', title: 'Shop Now'}]} />}
             </div>
         </section>
         {cartItems.length > 0 ? <section className='flex justify-center mt-2 justify-between bt-1 pt-1'>
