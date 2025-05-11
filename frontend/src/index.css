@@ -3,12 +3,19 @@
 html { scroll-behaviour: smooth; box-sizing: border-box; font-family: sans-serif; }
 *, *:before, *:after { box-sizing: inherit; margin: 0; padding: 0; }
 
+@font-face {
+  font-family: "DM Sans";
+  src: url('/fonts/DMSans-VariableFont_opsz,wght.ttf');
+}
+
 body {
   background-color: #1d1d1d;
   color: #fff;
 
   font-size: 18px;
   line-height: 24px;
+  font-family: "DM Sans";
+  margin: .5rem;
 }
 
 :root {
@@ -32,9 +39,7 @@ body {
 
 label { display: none; visibility: hidden; width: 0; height: 0; }
 
-h1 {
-  line-height: 5rem;
-}
+h1 { font-size: 2rem; line-height: 5rem; }
 
 h2 { font-size: 2rem; line-height: 3rem; }
 
@@ -55,9 +60,15 @@ a {
   text-decoration: none;
 }
 
+/*
 a.active {
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+*/
+
+a.active {
+  font-weight: 700;
 }
 
 /* ----------------------------------------------------------- */
@@ -121,7 +132,7 @@ footer {
     margin: 1rem;
   }
 
-  svg {
+  header svg {
     width: 20px;
     height: 20px;
   }
@@ -257,6 +268,18 @@ footer {
   width: 200px;
 }
 
+.min-w-1 {
+  min-width: 100px;
+}
+
+.min-w-1-5 {
+  min-width: 150px;
+}
+
+.min-w-2 {
+  min-width: 200px;
+}
+
 .max-w-2 {
   max-width: 200px;
 }
@@ -266,7 +289,29 @@ footer {
 }
 
 /* ----------------------------------------------------------- */
+/* HEIGHT */
+
+.h-min {
+  height: min-content;
+}
+
+.h-1 {
+  height: 100px;
+}
+
+/* ----------------------------------------------------------- */
+/* TEXT-ALIGN */
+
+.text-center {
+  text-align: center;
+}
+
+/* ----------------------------------------------------------- */
 /* PADDING */
+
+.p-0-5 {
+  padding: .5rem;
+}
 
 .p-0-75 {
   padding: .75rem;
@@ -274,6 +319,62 @@ footer {
 
 .p-1 {
   padding: 1rem;
+}
+
+.p-2 {
+  padding: 2rem;
+}
+
+.p-3 {
+  padding: 3rem;
+}
+
+/* ----------------------------------------------------------- */
+/* MARGIN-TOP */
+
+.mt-1 {
+  margin-top: 1rem;
+}
+
+.mt-2 {
+  margin-top: 2rem;
+}
+
+/* ----------------------------------------------------------- */
+/* BORDER */
+
+.bt-1 {
+  border-top: 1px solid #666;
+}
+
+/* ----------------------------------------------------------- */
+/* PADDING-X */
+
+.px-0-5 {
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+}
+
+/* ----------------------------------------------------------- */
+/* PADDING-TOP */
+
+.pt-1 {
+  padding-top: 1rem;
+}
+
+/* ----------------------------------------------------------- */
+/* PADDING-BOTTOM */
+
+.pb-1 {
+  padding-bottom: 1rem;
+}
+
+/* ----------------------------------------------------------- */
+/* PADDING-Y */
+
+.py-1 {
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 @media (min-width: 50em) {
@@ -288,12 +389,21 @@ form {
   position: relative;
 }
 
-form input, form button {
+form input, button, .bubble {
   border-radius: 100px;
   background-color: transparent;
   border: 1px solid #555;
   color: #fff;
   font-size: .95rem;
+}
+
+button, .bubble {
+  background-color: #333;
+}
+
+.bubble {
+  user-select: none;
+  height: 33px;
 }
 
 form input:focus {
@@ -313,14 +423,10 @@ form input[type="text"], form input[type="email"], form input[type="password"] {
   width: 100%;
 }
 
-form button {
+form button, .bubble {
   width: 7rem;
-  position: absolute;
   right: .25rem;
   top: .25rem;
-  cursor: pointer;
-  background-color: #333;
-
   border: 1px solid #555;
 
   display: flex;
@@ -329,18 +435,28 @@ form button {
   overflow: hidden;
 }
 
-form button svg {
-  width: 1rem;
-  height: 1rem;
+form button {
+  position: absolute;
+}
+
+button svg {
+  width: 16px;
+  height: 16px;
   fill: #555;
   transition: 0.25s ease;
+}
+
+.bubble svg {
+  width: 20px;
+  height: 20px;
+  fill: #555;
 }
 
 form button:focus svg, form button:hover svg {
   transform: translate(0, -50px);
 }
 
-form .send-text {
+.send-text {
   opacity: 0;
   position: absolute;
   top: 150px;

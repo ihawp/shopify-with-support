@@ -104,3 +104,67 @@ ul.messages li:not(:first-child) .username {
 #message-form {
     margin: 0 1rem 1rem;
 }
+
+#meet-our-support-team {
+    text-align: center;
+}
+
+#meet-our-support-team ul {
+    justify-content: center;
+}
+
+#meet-our-support-team li {
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    width: 185px;
+    border: 1px;
+
+    background-color: #333;
+    padding: 1rem 0 1.5rem 0;
+    border: 1px solid #666;
+    border-radius: 4px;
+}
+
+#meet-our-support-team .title {
+    margin: 3rem 0 2rem 0;
+    flex-direction: column;
+}
+
+#meet-out-support-team .title svg {
+    width: 50px;
+    height: 50px;
+}
+
+#meet-our-support-team .name {
+    font-size: 1.1rem;
+    line-height: 1.8rem;
+}
+
+#meet-our-support-team .job {
+    font-size: .8rem;
+    border: 1px solid #555;
+    padding: 0 1rem;
+    margin-top: 6px;
+    border-radius: 100px;
+    width: max-content;
+}
+
+#meet-our-support-team img {
+    height: 150px;
+    width: 150px;
+    object-fit: cover;
+    margin-bottom: 12px;
+
+    clip-path: inset(1px 1px -25px 1px);
+
+    box-shadow: 0 1px 25px 10px rgb(0, 0, 0, 0.1);
+}
+
+@media (min-width: 50em) {
+    #meet-our-support-team .title {
+        flex-direction: row;
+    }
+}

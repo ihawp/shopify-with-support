@@ -1,0 +1,42 @@
+#privacy {
+}
+
+
+#privacy h1 {
+    margin-top: 2rem;
+    font-size: 28px;
+}
+
+#privacy h2 {
+    font-size: 21px;
+    line-height: 34px;
+    padding: 1rem 0 .75rem 0;
+    margin: 1.5rem 0 1rem 0;
+    border-bottom: 1px solid #555;
+}
+
+#privacy p {
+    font-size: 16px;
+    line-height: 2rem;
+}
+
+#privacy ul {
+    list-style: disc;
+    padding: 0 0 0 2rem;
+}
+
+#privacy li {
+    font-size: 14px;
+    line-height: 1.75rem;
+}
+
+#privacy a {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+@media (min-width: 50em) {
+    #privacy header, #privacy section {
+        width: 800px;
+    }
+}

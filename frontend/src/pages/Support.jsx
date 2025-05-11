@@ -4,6 +4,9 @@ import { SocketContext } from '../middleware/SocketProvider';
 import '../styles/Support/support.css';
 import '../styles/Support/header.css';
 import '../styles/Support/section.css';
+import MeetSupportTeam from '../components/MeetSupportTeam';
+
+import Hero from '../components/Hero';
 
 export default function Support() {
     const { sendMessage, messages, changeRoom, newUsers, supportOnline, isTyping, stopTyping, userTyping, auth, users } = useContext(SocketContext);
@@ -50,8 +53,14 @@ export default function Support() {
     }
 
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behaviour: 'smooth' });
-    }, [messages]);
+        if (bottomRef.current && bottomRef.current.scrollIntoView) {
+          bottomRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'nearest',
+          });
+        }
+      }, [messages]);
 
     const RoomChanger = (room, name) => {
         resetMessageInput();
@@ -63,9 +72,7 @@ export default function Support() {
     }
 
     return <main id="support" className="flex flex-col items-center">
-            <header>
-                <h1>Support</h1>
-            </header>
+            <Hero leftIdentity='support-hero' backgroundClass={'background-2'} title='Support' subtitle='Need some help?' description='We are here to help you we care a lot so please let us know if you need anything.' hashLinks={[{to: '#support-online', title: "Get Support Now"}]} links={[{to: '/', title: "Shop"}]} />
             <div className="flex flex-row flex-wrap">
                 <header id="support-online" className="flex flex-row">
                     {auth === 'is-admin' ? <div className="header-is-admin flex flex-row items-center">
@@ -112,9 +119,9 @@ export default function Support() {
 
                         <div className='is-typing flex flex-row justify-between'>
                             <div>
-                            {userTyping.map((item, key) => {
-                                return <span key={key}>{key > 0 ? ',' : null} {item.name} is typing{userTyping.length === 1 ? '.' : null }</span>;
-                            })}
+                                {userTyping.map((item, key) => {
+                                    return <span key={key}>{key > 0 ? ',' : null} {item.name} is typing{userTyping.length === 1 ? '.' : null }</span>;
+                                })}
                             </div>
                             {inputLength ? <span>{inputLength}/255</span> : null}
                         </div>
@@ -132,5 +139,6 @@ export default function Support() {
                 </section>
 
             </div>
+            <MeetSupportTeam />
         </main>;
 }

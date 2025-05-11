@@ -1,0 +1,18 @@
+.shop-products {
+    gap: .5rem;
+}
+
+@media (min-width: 40em) {
+    .shop-products {
+        gap: 1rem;
+    }
+}
+
+@media (min-width: 65em) {
+    .shop-products .product .img-container {
+        margin-right: 0;
+    }
+    .shop-products {
+        gap: 2rem;
+    }
+}

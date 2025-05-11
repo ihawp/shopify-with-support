@@ -8,13 +8,14 @@
 // generate checkout button that links
 // to shopify SECURE checkout page
 
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 
 import { CartContext } from "../middleware/CartProvider";
 
-import CartProduct from '../components/CartProduct';
+import Product from '../components/Product';
 
 import { client } from '../middleware/ShopifyProvider';
+import Hero from '../components/Hero';
 
 export default function Cart() {
 
@@ -24,6 +25,7 @@ export default function Cart() {
     // Product is removed upon reload as it would not be included in localStorage
     // after the initial removal... unless it was readded to cart..!
     const [cartOnPrint, setCartOnPrint] = useState(cartItems);
+    const [cartPrice, setCartPrice] = useState(0);
 
     async function createCheckout(cartItems) {
         const lines = cartItems.map((item) => ({
@@ -76,26 +78,39 @@ export default function Cart() {
         addItemToCart(product);
     }
 
+    useEffect(() => {
+      if (cartItems.length > 0) {
+        const total = cartItems.reduce((sum, item) => {
+          const price = parseFloat(item?.variants?.edges[0]?.node?.price?.amount || 0);
+          return sum + price;
+        }, 0);
+    
+        setCartPrice(total);
+      } else {
+        setCartPrice(0);
+      }
+    }, [cartItems]);
+
     return <main className='flex flex-col items-center'>
-        <header>
+        {cartOnPrint.length > 0 ? <header>
             <h1>Cart</h1>
-        </header>
+        </header> : null}
         <section>
-            <p>Print cart contents here.</p>
-            <div>
-                {cartOnPrint.map((item, key) => {
+            <div className='cart-product flex flex-col gap-2'>
+                {cartOnPrint.length > 0 ? cartOnPrint.map((item, key) => {
                     // pipe drilling
-                    return <CartProduct key={key} item={item} cart={{ AddToCart, RemoveFromCart, isItemInCart }} />
-                })}
+                    return <Product key={key} node={item} cart={{ AddToCart, RemoveFromCart, isItemInCart }} />
+                }) : <Hero leftIdentity={'support-hero cart-hero'} backgroundClass={'background-1'} title='Cart' subtitle='Your Cart is empty!' description='Add items, or receive support by clicking the buttons below.' links={[{to: '/support', title: 'Get Support'}, {to: '/', title: 'Shop Now'}]} />}
             </div>
         </section>
-        <section>
+        {cartItems.length > 0 ? <section className='flex justify-center mt-2 justify-between bt-1 pt-1'>
+            <p>Total: ${cartPrice}.00</p>
             {cartItems.length > 0 && (
-                <button onClick={() => createCheckout(cartItems)}>
+                <button className="py-1 px-0-5" onClick={() => createCheckout(cartItems)}>
                     Go to Checkout
                 </button>
             )}
-        </section>
+        </section> : null}
     </main>
 
 }

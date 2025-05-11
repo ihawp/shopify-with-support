@@ -1,0 +1,197 @@
+#hero {
+    margin: 1.5rem 0 1rem 0;
+
+    height: 500px;
+
+    overflow: hidden;
+
+    border-radius: 4px;
+
+    border: 1px solid #666;
+
+    background-color: #222;
+
+    user-select: none;
+}
+
+/* ----------------------------------------------------------- */
+/* WRAPPER */
+
+#hero .hero-wrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    position: relative;
+    height: 100%;
+}
+
+/* ----------------------------------------------------------- */
+/* LEFT */
+
+#hero .left {
+
+    z-index: 1;
+
+}
+
+#hero .shop-hero.left h1 {
+    background: linear-gradient(90deg, rgb(248, 136, 192) 20%, rgb(250, 250, 77));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#hero .support-hero.left h1 {
+    background: linear-gradient(90deg, #555 20%, #888);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#hero .left .buttons {
+    margin-top: 20px;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #fff !important; /* optional: change text color */
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ----------------------------------------------------------- */
+/* RIGHT */
+
+#hero .right {
+    background-size: 100% 200%;
+    background-position: top;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    justify-content: end;
+    align-items: end;
+    background-repeat: no-repeat;
+}
+
+#hero .background-2 {
+    background-size: 750px 500px;
+}
+
+#hero .support-hero, #hero .shop-hero {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 3rem 1rem 0 2rem;
+    color: #fff;
+    transition: 1s ease;
+}
+
+#hero .support-hero {
+    background-color: #222;
+}
+
+#hero {
+    text-align: center;
+    height: max-content;
+}
+
+#hero .left {
+    padding: 1rem 1rem 2rem 1rem;
+}
+
+#hero .left h1 {
+    font-size: 40px;
+    margin-bottom: 1rem;
+}
+
+#hero .left h2 {
+    font-size: 34px;
+    line-height: 48px;
+    margin-bottom: 1rem;
+}
+
+#hero .left p {
+    font-size: 18px;
+    margin-bottom: 2rem;
+}
+
+#hero .left .buttons {
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+#hero .background-1 {
+    filter: blur(4px);
+    background-image: url('/futuristic_background_1.jpeg');
+}
+
+@media (min-width: 50em) {
+
+    #hero .background-1 {
+        filter: unset;
+    }
+    
+    #hero .background-2 {
+        background-image: url('/background_2.jpeg');
+    }
+    
+    #hero .background-3 {
+        background-image: url('/background_3.jpeg');
+    }
+
+    #hero {
+        text-align: start;
+        height: 500px;
+    }
+
+    #hero .left {
+        padding: 3rem 0 0 2rem;
+    }
+    #hero .support-hero {
+        width: 450px;
+        clip-path: polygon(0 0, 100% 0, 70% 100%, 0% 100%);
+    }
+
+    #hero .background-2 {
+        background-position: 130px;
+    }
+
+    #hero .left h1 {
+        font-size: 70px;
+        line-height: 70px;
+        margin-bottom: unset;
+    }
+
+    #hero .left h2 {
+        font-size: 34px;
+        line-height: 70px;
+        margin-bottom: unset;
+    }
+    
+    #hero .left p {
+        max-width: 300px;
+        font-size: 18px;
+        margin-bottom: unset;
+    }
+    
+    #hero .left .buttons {
+        width: 100%;
+        justify-content: start;
+    }
+
+    
+}
+
+@media (min-width: 65em) {
+    #hero .support-hero {
+        clip-path: polygon(0 0, 100% 0, 70% 100%, 0% 100%);
+    }
+
+    #hero .background-2 {
+        background-position: 300px;
+    }
+}

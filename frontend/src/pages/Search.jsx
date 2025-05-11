@@ -16,7 +16,7 @@ export default function Search() {
 
     }, []);
 
-    return <main>
+    return <main className='flex flex-col items-center'>
         <header>
             <h1>You searched for {cleanedQuery}:</h1>
         </header>

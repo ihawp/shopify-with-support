@@ -12,7 +12,8 @@ header#support-online {
 }
 
 #support-online .bubble {
-    width: max-content;
+    user-select: none;
+    width: 200px;
     margin: 8px 8px;
     border-radius: 100px;
     padding: 0 1rem;
@@ -35,7 +36,7 @@ header#support-online {
 }
 
 #support-online .header-is-admin {
-    width: calc(100% - 178px);
+    width: calc(100% - 180px);
 }
 
 #support-online .header-is-admin > div:nth-child(1) {

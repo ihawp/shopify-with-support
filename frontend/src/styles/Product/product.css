@@ -1,0 +1,126 @@
+.cart-product .product {
+    width: unset;
+    flex-direction: row;
+}
+
+.cart-product {
+    gap: .5rem;
+}
+
+.product {
+    transition: all .15s ease;
+    border: 1px solid #777;
+    background-color: #222;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+    overflow: hidden;
+    height: min-content;
+}
+
+.product, .product img {
+    border-radius: 4px;
+    height: max-content;
+}
+
+.product img {
+    object-fit: cover;
+}
+
+.product .img-container {
+    position: relative;
+    border: 1px solid #555;
+    border-radius: 4px;
+    height: 200px;
+    width: 100%;
+    margin-right: 16px;
+}
+
+.product .img-overlay {
+    background-color: rgb(22, 22, 22, 0.4);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: all .1s ease;
+}
+
+.product:hover {
+    background-color: #2a2a2a;
+}
+
+.product:hover .img-overlay {
+    opacity: 1;
+}
+
+.product h2 {
+    font-size: 18px;
+    line-height: 22px;
+    font-weight: 500;
+    margin: 0 0 10px 0;
+}
+
+.product p {
+    font-size: 14px;
+}
+
+.product {
+    height: max-content;
+    width: 100%;
+    flex-direction: column;
+}
+
+.product img {
+    width: 100%;
+    height: 200px;
+}
+
+.product .img-overlay {
+    height: 200px;
+}
+
+.product .content-container {
+    margin-top: 10px;
+    height: 160px;
+}
+
+.product .button-container {
+    height: 90px;
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+    width: 100%;
+    justify-content: space-between;
+}
+
+@media (min-width: 40em) {
+
+    .shop-products .product {
+        width: calc(50% - 8px);
+    }
+
+    .cart-product .product img, .cart-product .product .img-overlay, .cart-product .product .img-container {
+        width: 200px;
+    }
+    
+    .cart-product .product .button-container {
+        height: 100%;
+        width: 100%;
+    
+        display: flex;
+        flex-direction: row;
+        align-items: end;
+    
+        justify-content: space-between;
+    }
+
+}
+
+@media (min-width: 65em) {
+    .shop-products .product {
+        width: calc(33% - 18px);
+    }
+}
