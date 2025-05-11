@@ -8,19 +8,19 @@
     font-weight: 400;
 
     border-radius: 100px;
-    padding: 0 1rem;
+
+    flex-direction: row;
 
     margin-bottom: 1rem;
     position: relative;
 
     backdrop-filter: blur(1px);
+
 }
 
 .cart-title h1 {
-    font-size: 1.35rem;
-    background: linear-gradient(90deg, #fff 30%, gray);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    line-height: 0;
+    font-size: 1rem;
 }
 
 .cart-price {
@@ -29,19 +29,57 @@
 
 .cart-price .price-calculation {
 
-} 
+    font-size: 1rem;
+
+}
+
+.price-item-quantity {
+
+}
+
+.cart-title div {
+    margin-left: 1rem;
+    display: flex;
+    flex-direction: row;
+    background: linear-gradient(90deg, #fff 10%, #666);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    padding: .5rem 0;
+}
 
 .cart-price .price-calculation-total {
     font-size: .8rem;
     color: #666;
 }
 
-@media (min-width: 40em) {
-    .cart-title {
-        width: max-content;
+.cart-title p {
+    font-size: 1rem;
+}
+
+.cart-title button {
+    margin: 0;
+    height: max-content;
+}
+
+.cart-title button {
+    display: none;
+    visibility: hidden;
+}
+
+@media (min-width: 50em) {
+
+    .cart-title button {
+        display: block;
+        visibility: visible;
     }
 
-    .cart-title h1 {
-        font-size: 1rem;
+    .cart-title {
+        margin-top: 1.5rem;
+        padding: 1rem;
     }
+
+    .cart-title div {
+        padding: unset;
+    }
+
 }

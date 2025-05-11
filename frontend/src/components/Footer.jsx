@@ -12,7 +12,7 @@ export default function Footer() {
 
         <div className="bottom w-100 flex">
             <div className="flex flex-row items-center gap-0-5 logo footer">
-                <NavLink to='/' aria-label='Go to Shop/Home Page'>
+                <NavLink to='/' aria-label='Go to Shop Page'>
                     <Logo />
                 </NavLink>
                 <span>store.ihawp.com {new Date().getFullYear()}</span>
@@ -20,7 +20,7 @@ export default function Footer() {
             <nav>
                 <ul className="gap-1">
                     <li>
-                        <NavLink to="/" title="Home">Home</NavLink>
+                        <NavLink to="/" title="Shop">Shop</NavLink>
                     </li>
                     <li>
                         <NavLink to="/support" title="Support">Support</NavLink>

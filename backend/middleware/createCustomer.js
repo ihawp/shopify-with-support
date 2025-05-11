@@ -36,13 +36,18 @@ const createCustomer = async (req, res) => {
   
   // Getting consent update at must not be in the future error
   // Will look into it!
+
+
+  const date = new Date();
+  const trueDate = new Date(date.getTime() - 1000);
+
   const variables = {
       input: {
         email: email,
         emailMarketingConsent: {
           marketingState: "SUBSCRIBED",
           marketingOptInLevel: "SINGLE_OPT_IN",
-          consentUpdatedAt: new Date().toISOString(),
+          consentUpdatedAt: trueDate.toISOString(),
         },
       },
   };

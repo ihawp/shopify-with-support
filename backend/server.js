@@ -72,4 +72,8 @@ app.all('/*john', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
 });
 
-server.listen(3000);
+server.listen(3000, () => {
+  console.log(new Date());
+  console.log(new Date().toString());
+  console.log(Intl.DateTimeFormat().resolvedOptions().timeZone);
+});

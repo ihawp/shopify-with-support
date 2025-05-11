@@ -85,22 +85,25 @@ export default function Cart() {
         }
     }, [cartItems]);
 
-    const makeCheckoutButton = () => {
+    const makeCheckoutButton = (classList) => {
         return (
-            <button className="py-1 px-0-5" onClick={() => createCheckout(cartItems)}>
+            <button className={classList} onClick={() => createCheckout(cartItems)}>
                 Go to Checkout
             </button>
         );
     }
 
     return (
-        <main className='flex flex-col items-center'>
+        <main id="cart" className='flex flex-col items-center'>
             {cartItems.length > 0 ? (
-                <header>
-                    <div className='cart-title'>
-                        <h1>Your Cart | {cartItems.length} items</h1>
-                        <p>Total ${cartPrice.toFixed(2)}</p>
-                        {makeCheckoutButton()}
+                <header className='flex'>
+                    <div className='cart-title flex flex-row justify-between'>
+                      <div className='items-center gap-1'>
+                        <h1>Your Cart:</h1>
+                        <p>{cartItems.length} Item{cartItems.length > 1 ? 's' : null}</p>
+                        <p>Total: ${cartPrice.toFixed(2)}</p>
+                      </div>
+                      {makeCheckoutButton('py-1 px-0-5')}
                     </div>
                 </header>
             ) : null}
@@ -120,13 +123,14 @@ export default function Cart() {
                 </div>
             </section>
             {cartItems.length > 0 ? (
-                <section className='flex flex-col mt-2 pt-1 cart-price'>
+                <section className='flex flex-col mt-1 pt-1 cart-price'>
                     {itemizedPrices.length > 0 && (
                         <div>
+                            <h2 className="mb-1">Checkout:</h2>
                             <ul>
                               {itemizedPrices.map((item, idx) => (
                                 <li key={idx}>
-                                  <span className="price-calculation">{item.quantity} x {item.title}</span> <span className="price-calculation-total">(${item.total})</span>
+                                  <span className="price-calculation"><span className="price-item-quantity">{item.quantity} x</span> {item.title}</span> <span className="price-calculation-total">(${item.total})</span>
                                 </li>
                               ))}
                             </ul>
@@ -134,7 +138,7 @@ export default function Cart() {
                     )}
                     <div className='flex flex-row w-100 items-center mt-1 bt-1 pt-1 justify-between'>
                       <p>Total: ${cartPrice.toFixed(2)}</p>
-                      {makeCheckoutButton()}
+                      {makeCheckoutButton('py-1 px-0-5')}
                     </div>
                 </section>
             ) : null}

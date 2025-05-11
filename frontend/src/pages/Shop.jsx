@@ -18,7 +18,7 @@ export default function Shop() {
   const { users } = useContext(SocketContext);
 
   const fetchFromSearch = async (val) => {
-    if (!val || val.trim() === '') {
+    if (!val || val.trim() === '' || val.length < 3) {
       setSearchResults(null);
       return;
     }
@@ -58,18 +58,17 @@ export default function Shop() {
       }
     `;
   
-    // use query: `${val}` rather then query: `title:${val}`
+    // use tags
     const response = await client.request(searchQuery, {
       variables: {
-        query: `${val.trim()}`,
+        query: `tag:${val.trim()}`,
         first: 20,
         types: ['PRODUCT'],
       },
     });
-
-    console.log(searchResults);
   
-    if (response?.data?.search?.edges) setSearchResults(response.data.search.edges.map(edge => edge));
+    if (response?.data?.search?.edges.length > 0){
+      setSearchResults(response.data.search.edges.map(edge => edge))};
   };
 
   const fetchProducts = async (cursor = null) => {
@@ -170,7 +169,7 @@ export default function Shop() {
         </section>
       )}
 
-      {searchResults !== null && searchResults.length === 0 ? <section className='search-results'>
+      {searchResults !== null && searchResults.length === 0 ? <section className='search-results flex flex-row items-center justify-center'>
         <h2>No Search Results.</h2>
       </section> : null}
     </main>;

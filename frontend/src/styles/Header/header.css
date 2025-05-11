@@ -25,7 +25,8 @@
 }
 
 .search-navigation input[type="text"], .search-navigation input[type="email"], .search-navigation input[type="password"] {
-    padding: .43rem 4.5rem .43rem 1rem;
+    /* padding: .43rem 1rem .43rem 1rem; */
+    padding: .43rem 2rem .43rem 1rem;
 }
 
 .search-navigation button[type="submit"] {

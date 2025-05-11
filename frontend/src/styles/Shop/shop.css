@@ -6,6 +6,17 @@
     height: 500px;
 }
 
+.remove-search-input {
+    background-color: transparent;
+
+    border: none;
+
+    top: 45%;
+    right: 15px;
+
+    transform: translate(0, -50%);
+}
+
 @media (min-width: 40em) {
     .shop-products {
         gap: 1rem;

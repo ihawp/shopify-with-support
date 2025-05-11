@@ -26,7 +26,7 @@ export default function EmailEntry() {
       });
   
       if (!res.ok) {
-        return setMessage('Something went wrong please try again.');
+        return setMessage('Something went wrong please try again later.');
       }
 
       const data = await res.json();
@@ -42,7 +42,7 @@ export default function EmailEntry() {
       }
     } catch (error) {
       console.error(error);
-      setMessage('Something went wrong. Please try again.');
+      setMessage('Something went wrong. Please try again later.');
     }
   };
 

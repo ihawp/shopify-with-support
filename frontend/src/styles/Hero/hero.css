@@ -132,6 +132,11 @@ input:-webkit-autofill:active {
 
 @media (min-width: 50em) {
 
+    
+    #hero h1 {
+        width: max-content;
+    }
+
     #hero .background-1.right {
         background-position: 0 180px;
     }
