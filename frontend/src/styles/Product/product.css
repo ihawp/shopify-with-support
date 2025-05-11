@@ -36,6 +36,7 @@
     height: 200px;
     width: 100%;
     margin-right: 16px;
+    overflow: hidden;
 }
 
 .product .img-overlay {
@@ -116,9 +117,10 @@
     }
 
     .cart-product .product img, .cart-product .product .img-overlay, .cart-product .product .img-container {
-        width: 200px;
+        min-width: 200px;
+        max-width: 200px;
     }
-    
+
     .cart-product .product .button-container {
         height: 100%;
         width: 100%;

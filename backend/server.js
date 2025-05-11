@@ -4,6 +4,8 @@ const http = require('http');
 const cors = require('cors');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const path = require('path');
+const compression = require('compression');
 
 // Yet to implement
 const winston = require('winston');
@@ -32,26 +34,42 @@ const server = http.createServer(app);
 
 new SocketInterface(server, UserDirector, AdminDirector);
 
+app.use(compression());
 app.use(cors(corsOptions));
-app.use(helmet());
 app.use(setHeader);
 app.use(express.json());
 app.use(cookieParser());
+
+
+// Do more helmet setup
+app.use(helmet.contentSecurityPolicy({ 
+  directives: { 
+    connectSrc: ["'self'", 'https://x00qwc-pe.myshopify.com'], 
+    imgSrc: ["'self'", 'https://cdn.shopify.com'] 
+  }
+}));
+
+
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 app.post('/create-customer', createCustomer);
 
 app.get('/getUsers', verifyJWT, (req, res) => {
   let usersWithRooms = UserDirector.getAllUsers();
-  res.json(usersWithRooms); 
+  res.json(usersWithRooms);
 });
 
 app.get('/getUsersCount', (req, res) => {
   let usersWithRooms = UserDirector.getAllUsers().length;
-  res.json({ count: usersWithRooms }); 
+  res.json({ count: usersWithRooms });
 });
 
 app.post('/login', adminLogin);
 
 app.get('/user-login', checkAdminToken, checkValidGuestToken, issueGuestToken);
+
+app.all('/*john', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+});
 
 server.listen(3000);
