@@ -1,10 +1,6 @@
 const { SHOPIFY_ADMIN_API_URL, ADMIN_API_TOKEN } = require('../keys.js');
 
-        // don't need ltrim here, but could be used for canonicalizing emails
-        // let ltrimMessage = validator.ltrim(message);
-        // validator.normalizeEmail
 const validator = require('validator');
-
 
 const mutation = `
     mutation customerCreate($input: CustomerInput!) {

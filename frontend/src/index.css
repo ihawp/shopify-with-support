@@ -5,7 +5,7 @@ html { scroll-behaviour: smooth; box-sizing: border-box; font-family: sans-serif
 
 @font-face {
   font-family: "DM Sans";
-  src: url('/fonts/DMSans-VariableFont_opsz,wght.ttf');
+  src: url('/fonts/DMSans.woff2');
 }
 
 body {

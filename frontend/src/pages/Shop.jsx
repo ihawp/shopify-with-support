@@ -115,7 +115,7 @@ export default function Shop() {
 
       const productVariables = {
         variables: {
-          first: 3,
+          first: 6,
           after: cursor || null
         }
       }
